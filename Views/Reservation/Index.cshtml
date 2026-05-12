@@ -1,0 +1,66 @@
+@model IEnumerable<ProjetEMIT.Models.Reservation>
+
+    @{
+    ViewData["Title"] = "Gestion des Réservations - EMIT";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-calendar-check"></i> Réservations des Salles</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Nouvelle Réservation
+        </a>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Salle</th>
+                <th>Date</th>
+                <th>Horaire</th>
+                <th>Motif</th>
+                <th>Demandeur</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Salle.NomSalle</td>
+                <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                <td>@item.HeureDebut - @item.HeureFin</td>
+                <td>@item.Motif</td>
+                <td>@item.Demandeur?.Nom @item.Demandeur?.Prenom</td>
+                <td>
+                    @switch (item.Statut)
+                    {
+                        case "Validee": <span class="badge bg-success">Validée</span> break;
+                        case "Refusee": <span class="badge bg-danger">Refusée</span> break;
+                        case "Annulee": <span class="badge bg-secondary">Annulée</span> break;
+                        default: <span class="badge bg-warning">En Attente</span> break;
+                    }
+                </td>
+                <td>
+                    @if (item.Statut == "EnAttente" && (User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique")))
+                    {
+                    <form asp-action="Valider" method="post" asp-route-id="@item.Id" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-success">Valider</button>
+                    </form>
+                    <form asp-action="Refuser" method="post" asp-route-id="@item.Id" class="d-inline ms-1">
+                        <input type="text" name="motifRefus" class="form-control form-control-sm d-inline-block" style="width:140px;display:inline-block!important" placeholder="Motif refus" />
+                        <button type="submit" class="btn btn-sm btn-danger">Refuser</button>
+                    </form>
+                    }
+                    @if (item.Statut == "EnAttente" && item.Demandeur?.UserName == User.Identity?.Name)
+                    {
+                    <form asp-action="Annuler" method="post" asp-route-id="@item.Id" class="d-inline ms-1">
+                        <button type="submit" class="btn btn-sm btn-warning">Annuler</button>
+                    </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>

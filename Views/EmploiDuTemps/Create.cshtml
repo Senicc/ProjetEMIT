@@ -1,0 +1,110 @@
+@model SeanceViewModel
+@{
+    ViewData["Title"] = "Nouvelle séance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var salles = ViewBag.Salles as IEnumerable<ProjetEMIT.Models.Salle>;
+    var enseignants = ViewBag.Enseignants as IEnumerable<ProjetEMIT.Models.Enseignant>;
+    var creneaux = ViewBag.Creneaux as IEnumerable<ProjetEMIT.Models.Creneau>;
+    var matieres = ViewBag.Matieres as IEnumerable<ProjetEMIT.Models.Matiere>;
+    var classes = ViewBag.Classes as IEnumerable<ProjetEMIT.Models.Classe>;
+}
+
+<h2 class="mb-4">Planifier une séance</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Date" class="form-label"></label>
+            <input asp-for="Date" class="form-control" type="date" />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="CreneauId" class="form-label"></label>
+            <select asp-for="CreneauId" class="form-select">
+                <option value="">-- Créneau --</option>
+                @if (creneaux != null)
+                {
+                    foreach (var c in creneaux)
+                    {
+                        <option value="@c.Id">@c.Nom (@c.HeureDebut - @c.HeureFin)</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="TypeSeance" class="form-label"></label>
+            <select asp-for="TypeSeance" class="form-select">
+                <option>Cours</option>
+                <option>TD</option>
+                <option>TP</option>
+                <option>Examen</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="SalleId" class="form-label"></label>
+            <select asp-for="SalleId" class="form-select">
+                <option value="">-- Salle --</option>
+                @if (salles != null)
+                {
+                    foreach (var s in salles)
+                    {
+                        <option value="@s.Id">@s.NomSalle</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="EnseignantId" class="form-label"></label>
+            <select asp-for="EnseignantId" class="form-select">
+                <option value="">-- Enseignant --</option>
+                @if (enseignants != null)
+                {
+                    foreach (var e in enseignants)
+                    {
+                        <option value="@e.Id">@e.Prenom @e.Nom</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="MatiereId" class="form-label"></label>
+            <select asp-for="MatiereId" class="form-select">
+                <option value="">-- Matière --</option>
+                @if (matieres != null)
+                {
+                    foreach (var m in matieres)
+                    {
+                        <option value="@m.Id">@m.Code — @m.Nom</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="ClasseId" class="form-label"></label>
+            <select asp-for="ClasseId" class="form-select">
+                <option value="">-- Classe --</option>
+                @if (classes != null)
+                {
+                    foreach (var c in classes)
+                    {
+                        <option value="@c.Id">@c.Nom (@c.Filiere?.Code — @c.Niveau?.Nom)</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

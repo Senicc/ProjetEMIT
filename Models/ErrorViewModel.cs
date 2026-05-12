@@ -1,8 +1,16 @@
-namespace ProjetEMIT.Models;
+using System.ComponentModel.DataAnnotations;        // Pour [Required], [Display], etc.
+using Microsoft.AspNetCore.Identity;               // Pour Identity
+using Microsoft.EntityFrameworkCore;               // Pour DbContext, DbSet
+using ProjetEMIT.Models;
+using ProjetEMIT.ViewModels;
+using ProjetEMIT.Services.Interfaces;
+using ProjetEMIT.Repositories.Interfaces;
 
-public class ErrorViewModel
+namespace ProjetEMIT.Models
 {
-    public string? RequestId { get; set; }
-
-    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    public class ErrorViewModel
+    {
+        public string? RequestId { get; set; }
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    }
 }

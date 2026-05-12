@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "Accès refusé";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="alert alert-danger">
+    <h4>Accès refusé</h4>
+    <p>Vous n'avez pas les droits nécessaires pour accéder à cette ressource.</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Accueil</a>
+</div>

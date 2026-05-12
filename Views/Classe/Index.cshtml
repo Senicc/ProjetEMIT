@@ -1,0 +1,27 @@
+@model IEnumerable<ProjetEMIT.Models.Classe>
+@{
+    ViewData["Title"] = "Classes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4"><i class="fas fa-users"></i> Classes</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Nom</th>
+            <th>Filière</th>
+            <th>Niveau</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@c.Nom</td>
+            <td>@c.Filiere?.Nom</td>
+            <td>@c.Niveau?.Nom</td>
+        </tr>
+    }
+    </tbody>
+</table>

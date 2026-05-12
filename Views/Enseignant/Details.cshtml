@@ -1,0 +1,41 @@
+@model ProjetEMIT.Models.Enseignant
+@{
+    ViewData["Title"] = "Détail enseignant";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var seances = ViewBag.Seances as IEnumerable<ProjetEMIT.Models.Seance>;
+}
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4>@Model.Prenom @Model.Nom</h4>
+    </div>
+    <div class="card-body">
+        <p><strong>Email :</strong> @Model.Email</p>
+        <p><strong>Téléphone :</strong> @Model.Telephone</p>
+        <p><strong>Spécialité :</strong> @Model.Specialite</p>
+        <p><strong>Matières :</strong> @string.Join(", ", Model.Matieres.Select(m => m.Nom))</p>
+    </div>
+</div>
+
+@if (seances != null && seances.Any())
+{
+    <h5>Séances (toutes périodes)</h5>
+    <table class="table table-sm">
+        <thead><tr><th>Date</th><th>Matière</th><th>Classe</th><th>Salle</th></tr></thead>
+        <tbody>
+        @foreach (var s in seances.OrderBy(x => x.Date))
+        {
+            <tr>
+                <td>@s.Date.ToString("dd/MM/yyyy")</td>
+                <td>@s.Matiere.Nom</td>
+                <td>@s.Classe.Nom</td>
+                <td>@s.Salle.NomSalle</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

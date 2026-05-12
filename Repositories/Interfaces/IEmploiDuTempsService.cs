@@ -1,4 +1,7 @@
-﻿// Services/Interfaces/IEmploiDuTempsService.cs
+﻿using ProjetEMIT.Models;
+
+namespace ProjetEMIT.Repositories.Interfaces;
+
 public interface IEmploiDuTempsService
 {
     Task<bool> CreerSeanceAsync(Seance seance);
@@ -7,7 +10,10 @@ public interface IEmploiDuTempsService
 
     Task<IEnumerable<Seance>> GetEmploiParClasseAsync(int classeId, DateOnly? debut = null, DateOnly? fin = null);
     Task<IEnumerable<Seance>> GetEmploiParEnseignantAsync(int enseignantId, DateOnly? debut = null, DateOnly? fin = null);
-    Task<IEnumerable<Seance>> GetEmploiParSalleAsync(int salleId, DateOnly date);
+    Task<IEnumerable<Seance>> GetEmploiParSalleAsync(int salleId, DateOnly? debut = null, DateOnly? fin = null);
+
+    Task<IEnumerable<Seance>> GetAllSeancesAsync(DateOnly? debut = null, DateOnly? fin = null);
+    Task<int> GetSeancesDuJourCountAsync(DateOnly? jour = null);
 
     Task<ConflitResult> VerifierConflitsAsync(Seance seance, bool exclureSeanceActuelle = false);
 }

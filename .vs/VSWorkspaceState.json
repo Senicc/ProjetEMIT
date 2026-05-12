@@ -1,16 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Controllers",
     "\\Data",
     "\\Data\\Helpers",
-    "\\Repositories",
-    "\\Repositories\\Implementations",
-    "\\Repositories\\Interfaces",
-    "\\ViewModels",
     "\\Views",
-    "\\Views\\Account"
+    "\\Views\\Admin",
+    "\\Views\\Enseignant",
+    "\\Views\\Home",
+    "\\Views\\Matiere",
+    "\\Views\\Reservation",
+    "\\Views\\Salle"
   ],
-  "SelectedNode": "\\Views\\Account\\Login.cshtml",
+  "SelectedNode": "\\Data\\Helpers\\SeedData.cs",
   "PreviewInSolutionExplorer": false
 }

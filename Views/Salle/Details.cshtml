@@ -1,0 +1,40 @@
+@model ProjetEMIT.Models.Salle
+@{
+    ViewData["Title"] = "Salle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var seances = ViewBag.SeancesAujourdhui as IEnumerable<ProjetEMIT.Models.Seance>;
+}
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h4>@Model.NomSalle</h4>
+    </div>
+    <div class="card-body">
+        <p><strong>Capacité :</strong> @Model.Capacite</p>
+        <p><strong>Type :</strong> @Model.TypeSalle</p>
+        <p><strong>Localisation :</strong> @Model.Localisation</p>
+        <p><strong>Disponible :</strong> @(Model.EstDisponible ? "Oui" : "Non")</p>
+    </div>
+</div>
+
+@if (seances != null && seances.Any())
+{
+    <h5 class="mt-4">Séances aujourd'hui</h5>
+    <table class="table table-sm">
+        <thead><tr><th>Créneau</th><th>Matière</th><th>Classe</th></tr></thead>
+        <tbody>
+        @foreach (var s in seances)
+        {
+            <tr>
+                <td>@s.Creneau.HeureDebut - @s.Creneau.HeureFin</td>
+                <td>@s.Matiere.Nom</td>
+                <td>@s.Classe.Nom</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

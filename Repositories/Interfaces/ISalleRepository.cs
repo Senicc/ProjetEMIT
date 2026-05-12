@@ -1,4 +1,7 @@
-﻿// Repositories/Interfaces/ISalleRepository.cs
+﻿using ProjetEMIT.Models;
+
+namespace ProjetEMIT.Repositories.Interfaces;
+
 public interface ISalleRepository : IBaseRepository<Salle>
 {
     Task<IEnumerable<Salle>> GetSallesDisponiblesAsync(DateOnly date, TimeOnly heureDebut, TimeOnly heureFin);

@@ -1,0 +1,64 @@
+@model MatiereViewModel
+@{
+    ViewData["Title"] = "Nouvelle matière";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var filieres = ViewBag.Filieres as IEnumerable<ProjetEMIT.Models.Filiere>;
+    var enseignants = ViewBag.Enseignants as IEnumerable<ProjetEMIT.Models.Enseignant>;
+}
+
+<h2 class="mb-4">Nouvelle matière</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="Code" class="form-label"></label>
+        <input asp-for="Code" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Nom" class="form-label"></label>
+        <input asp-for="Nom" class="form-control" />
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Coefficient" class="form-label"></label>
+            <input asp-for="Coefficient" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="NbreHeures" class="form-label"></label>
+            <input asp-for="NbreHeures" class="form-control" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="FiliereId" class="form-label">Filière</label>
+        <select asp-for="FiliereId" class="form-select">
+            <option value="">-- Choisir --</option>
+            @if (filieres != null)
+            {
+                foreach (var f in filieres)
+                {
+                    <option value="@f.Id">@f.Code — @f.Nom</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Enseignants</label>
+        @if (enseignants != null)
+        {
+            foreach (var e in enseignants)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="SelectedEnseignantsIds" value="@e.Id"
+                           id="ens_@e.Id" @(Model.SelectedEnseignantsIds.Contains(e.Id) ? "checked" : null) />
+                    <label class="form-check-label" for="ens_@e.Id">@e.Prenom @e.Nom</label>
+                </div>
+            }
+        }
+    </div>
+    <button type="submit" class="btn btn-primary">Créer</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

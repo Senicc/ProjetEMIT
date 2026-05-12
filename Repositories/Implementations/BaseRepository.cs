@@ -1,4 +1,9 @@
-﻿// Repositories/Implementations/BaseRepository.cs
+﻿using Microsoft.EntityFrameworkCore;
+using ProjetEMIT.Data;
+using ProjetEMIT.Repositories.Interfaces;
+
+namespace ProjetEMIT.Repositories.Implementations;
+
 public class BaseRepository<T> : IBaseRepository<T> where T : class
 {
     protected readonly ApplicationDbContext _context;
@@ -36,7 +41,8 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         }
     }
 
-    public virtual async Task<bool> ExistsAsync(int id) => await _dbSet.AnyAsync(e => EF.Property<int>(e, "Id") == id);
+    public virtual async Task<bool> ExistsAsync(int id) =>
+        await _dbSet.AnyAsync(e => EF.Property<int>(e, "Id") == id);
 
     public IQueryable<T> GetQueryable() => _dbSet.AsQueryable();
 }

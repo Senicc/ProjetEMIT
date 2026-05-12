@@ -1,48 +1,47 @@
-﻿// Services/Implementations/EmploiDuTempsService.cs
+﻿using Microsoft.EntityFrameworkCore;
+using ProjetEMIT.Data;
+using ProjetEMIT.Models;
+using ProjetEMIT.Repositories.Interfaces;
+
+namespace ProjetEMIT.Repositories.Implementations;
+
 public class EmploiDuTempsService : IEmploiDuTempsService
 {
     private readonly ISeanceRepository _seanceRepository;
-    private readonly ISalleRepository _salleRepository;
+    private readonly ApplicationDbContext _context;
 
-    public EmploiDuTempsService(ISeanceRepository seanceRepository, ISalleRepository salleRepository)
+    public EmploiDuTempsService(ISeanceRepository seanceRepository, ApplicationDbContext context)
     {
         _seanceRepository = seanceRepository;
-        _salleRepository = salleRepository;
+        _context = context;
+    }
+
+    private async Task<Creneau> ResolveCreneauAsync(Seance seance)
+    {
+        if (seance.Creneau != null) return seance.Creneau;
+        var c = await _context.Creneaux.AsNoTracking().FirstOrDefaultAsync(x => x.Id == seance.CreneauId);
+        return c ?? throw new InvalidOperationException("Créneau introuvable.");
     }
 
     public async Task<ConflitResult> VerifierConflitsAsync(Seance seance, bool exclureSeanceActuelle = false)
     {
         var result = new ConflitResult();
-        var exclureId = exclureSeanceActuelle ? seance.Id : null;
+        var exclureId = exclureSeanceActuelle ? seance.Id : (int?)null;
+        var creneau = await ResolveCreneauAsync(seance);
 
-        // Conflit Salle
-        bool conflitSalle = await _seanceRepository.ExisteConflitSalleAsync(
-            seance.SalleId, seance.Date, seance.Creneau.HeureDebut, seance.Creneau.HeureFin, exclureId);
-
-        if (conflitSalle)
-        {
+        if (await _seanceRepository.ExisteConflitSalleAsync(
+                seance.SalleId, seance.Date, creneau.HeureDebut, creneau.HeureFin, exclureId))
             result.Conflits.Add("Salle déjà occupée à cet horaire");
-        }
 
-        // Conflit Enseignant
-        bool conflitEnseignant = await _seanceRepository.ExisteConflitEnseignantAsync(
-            seance.EnseignantId, seance.Date, seance.Creneau.HeureDebut, seance.Creneau.HeureFin, exclureId);
-
-        if (conflitEnseignant)
-        {
+        if (await _seanceRepository.ExisteConflitEnseignantAsync(
+                seance.EnseignantId, seance.Date, creneau.HeureDebut, creneau.HeureFin, exclureId))
             result.Conflits.Add("Enseignant déjà occupé à cet horaire");
-        }
 
-        // Conflit Classe
-        bool conflitClasse = await _seanceRepository.ExisteConflitClasseAsync(
-            seance.ClasseId, seance.Date, seance.Creneau.HeureDebut, seance.Creneau.HeureFin, exclureId);
-
-        if (conflitClasse)
-        {
+        if (await _seanceRepository.ExisteConflitClasseAsync(
+                seance.ClasseId, seance.Date, creneau.HeureDebut, creneau.HeureFin, exclureId))
             result.Conflits.Add("Classe déjà en cours à cet horaire");
-        }
 
-        result.HasConflit = result.Conflits.Any();
+        result.HasConflit = result.Conflits.Count > 0;
         result.Message = result.HasConflit
             ? "Conflits détectés : " + string.Join(" | ", result.Conflits)
             : "Aucun conflit détecté";
@@ -53,7 +52,6 @@ public class EmploiDuTempsService : IEmploiDuTempsService
     public async Task<bool> CreerSeanceAsync(Seance seance)
     {
         var conflits = await VerifierConflitsAsync(seance);
-
         if (conflits.HasConflit)
             throw new InvalidOperationException(conflits.Message);
 
@@ -61,22 +59,37 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         return true;
     }
 
-    public async Task<IEnumerable<Seance>> GetEmploiParClasseAsync(int classeId, DateOnly? debut = null, DateOnly? fin = null)
+    public async Task<bool> ModifierSeanceAsync(Seance seance)
     {
-        return await _seanceRepository.GetEmploiDuTempsParClasseAsync(classeId, debut, fin);
+        var conflits = await VerifierConflitsAsync(seance, exclureSeanceActuelle: true);
+        if (conflits.HasConflit)
+            throw new InvalidOperationException(conflits.Message);
+
+        await _seanceRepository.UpdateAsync(seance);
+        return true;
     }
 
-    // Autres méthodes...
-    public async Task<IEnumerable<Seance>> GetEmploiParEnseignantAsync(int enseignantId, DateOnly? debut = null, DateOnly? fin = null)
+    public async Task<bool> SupprimerSeanceAsync(int id)
     {
-        return await _seanceRepository.GetEmploiDuTempsParEnseignantAsync(enseignantId, debut, fin);
+        await _seanceRepository.DeleteAsync(id);
+        return true;
     }
 
-    public Task<IEnumerable<Seance>> GetEmploiParSalleAsync(int salleId, DateOnly date)
-    {
-        return _seanceRepository.GetEmploiDuTempsParSalleAsync(salleId, date);
-    }
+    public Task<IEnumerable<Seance>> GetEmploiParClasseAsync(int classeId, DateOnly? debut = null, DateOnly? fin = null) =>
+        _seanceRepository.GetEmploiDuTempsParClasseAsync(classeId, debut, fin);
 
-    public Task<bool> ModifierSeanceAsync(Seance seance) => throw new NotImplementedException("À implémenter");
-    public Task<bool> SupprimerSeanceAsync(int id) => throw new NotImplementedException("À implémenter");
+    public Task<IEnumerable<Seance>> GetEmploiParEnseignantAsync(int enseignantId, DateOnly? debut = null, DateOnly? fin = null) =>
+        _seanceRepository.GetEmploiDuTempsParEnseignantAsync(enseignantId, debut, fin);
+
+    public Task<IEnumerable<Seance>> GetEmploiParSalleAsync(int salleId, DateOnly? debut = null, DateOnly? fin = null) =>
+        _seanceRepository.GetEmploiDuTempsParSalleAsync(salleId, debut, fin);
+
+    public Task<IEnumerable<Seance>> GetAllSeancesAsync(DateOnly? debut = null, DateOnly? fin = null) =>
+        _seanceRepository.GetAllInRangeAsync(debut, fin);
+
+    public async Task<int> GetSeancesDuJourCountAsync(DateOnly? jour = null)
+    {
+        var d = jour ?? DateOnly.FromDateTime(DateTime.Today);
+        return await _seanceRepository.CountSeancesDuJourAsync(d);
+    }
 }

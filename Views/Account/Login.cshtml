@@ -1,4 +1,5 @@
-﻿@{
+﻿@model LoginViewModel
+@{
     ViewData["Title"] = "Connexion - EMIT";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -39,3 +40,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

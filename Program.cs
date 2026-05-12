@@ -1,45 +1,33 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using ProjetEMIT;
 using ProjetEMIT.Data;
+using ProjetEMIT.Data.Helpers;
 using ProjetEMIT.Models;
-using ProjetEMIT.Repositories.Interfaces;
 using ProjetEMIT.Repositories.Implementations;
-using ProjetEMIT.Services.Interfaces;
-using ProjetEMIT.Helpers;
+using ProjetEMIT.Repositories.Interfaces;
 using ProjetEMIT.Services.Implementations;
+using ProjetEMIT.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =============================================
-// Configuration de la base de donnÈes PostgreSQL
-// =============================================
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-    // Meilleures pratiques pour PostgreSQL
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-});
-
-
-// =============================================
-// Configuration ASP.NET Identity
-// =============================================
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    options.Password.RequiredLength = 8;
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-
-    options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false; // ¿ activer en production
-})
+    {
+        options.Password.RequiredLength = 8;
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.User.RequireUniqueEmail = true;
+        options.SignIn.RequireConfirmedEmail = false;
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Configuration des cookies
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -50,12 +38,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-
-// =============================================
-// Services & Repositories (Dependency Injection)
-// =============================================
-
-// Repositories
 builder.Services.AddScoped<ISalleRepository, SalleRepository>();
 builder.Services.AddScoped<IEnseignantRepository, EnseignantRepository>();
 builder.Services.AddScoped<IMatiereRepository, MatiereRepository>();
@@ -65,23 +47,24 @@ builder.Services.AddScoped<ISeanceRepository, SeanceRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<ICreneauRepository, CreneauRepository>();
 
-// Services (Business Logic)
 builder.Services.AddScoped<ISalleService, SalleService>();
 builder.Services.AddScoped<IEmploiDuTempsService, EmploiDuTempsService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IEnseignantService, EnseignantService>();
+builder.Services.AddScoped<IMatiereService, MatiereService>();
+builder.Services.AddScoped<IFiliereService, FiliereService>();
 builder.Services.AddScoped<IRapportService, RapportService>();
 
-// AutoMapper
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
-// =============================================
-// MVC + Autres services
-// =============================================
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+    options.ValidationInterval = TimeSpan.FromMinutes(30));
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 builder.Services.AddControllersWithViews()
-    .AddRazorRuntimeCompilation(); // Utile pendant le dÈveloppement
+    .AddRazorRuntimeCompilation();
 
-// Ajout de la session (si besoin pour notifications temporaires)
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -90,10 +73,6 @@ builder.Services.AddSession(options =>
 });
 
 var app = builder.Build();
-
-// =============================================
-// Pipeline HTTP
-// =============================================
 
 if (!app.Environment.IsDevelopment())
 {
@@ -107,17 +86,11 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.UseAuthentication();   // Important : Avant Authorization
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseSession();
 
-// =============================================
-// Routes
-// =============================================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -126,25 +99,19 @@ app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-// =============================================
-// Seed des rÙles et donnÈes initiales
-// =============================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
-        await context.Database.MigrateAsync(); // Applique les migrations
-        await SeedData.InitializeAsync(services); // ¿ crÈer dans Helpers/SeedData.cs
+        await context.Database.MigrateAsync();
+        await SeedData.InitializeAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Une erreur est survenue lors du Seed de la base de donnÈes.");
+        logger.LogError(ex, "Une erreur est survenue lors du Seed de la base de donnùes.");
     }
 }
 

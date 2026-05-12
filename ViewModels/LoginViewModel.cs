@@ -1,4 +1,8 @@
-﻿public class LoginViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjetEMIT.ViewModels;
+
+public class LoginViewModel
 {
     [Required]
     [EmailAddress]

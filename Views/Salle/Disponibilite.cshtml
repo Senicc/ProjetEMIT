@@ -1,0 +1,25 @@
+@model IEnumerable<ProjetEMIT.Models.Salle>
+@{
+    ViewData["Title"] = "Disponibilité des salles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var d = (DateOnly)ViewBag.SelectedDate;
+}
+
+<h2 class="mb-4">Salles disponibles — @d.ToString("dd/MM/yyyy")</h2>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr><th>Salle</th><th>Capacité</th><th>Type</th><th>Lieu</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var s in Model)
+    {
+        <tr>
+            <td>@s.NomSalle</td>
+            <td>@s.Capacite</td>
+            <td>@s.TypeSalle</td>
+            <td>@s.Localisation</td>
+        </tr>
+    }
+    </tbody>
+</table>

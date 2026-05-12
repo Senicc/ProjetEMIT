@@ -1,27 +1,37 @@
-﻿public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using ProjetEMIT.Models;
+
+namespace ProjetEMIT.Data;
+
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-    public DbSet<Salle> Salles { get; set; }
-    public DbSet<Enseignant> Enseignants { get; set; }
-    public DbSet<Matiere> Matieres { get; set; }
-    public DbSet<Filiere> Filieres { get; set; }
-    public DbSet<Niveau> Niveaux { get; set; }
-    public DbSet<Classe> Classes { get; set; }
-    public DbSet<Creneau> Creneaux { get; set; }
-    public DbSet<Seance> Seances { get; set; }
-    public DbSet<Reservation> Reservations { get; set; }
+    public DbSet<Salle> Salles => Set<Salle>();
+    public DbSet<Enseignant> Enseignants => Set<Enseignant>();
+    public DbSet<Matiere> Matieres => Set<Matiere>();
+    public DbSet<Filiere> Filieres => Set<Filiere>();
+    public DbSet<Niveau> Niveaux => Set<Niveau>();
+    public DbSet<Classe> Classes => Set<Classe>();
+    public DbSet<Creneau> Creneaux => Set<Creneau>();
+    public DbSet<Seance> Seances => Set<Seance>();
+    public DbSet<Reservation> Reservations => Set<Reservation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurations des relations Many-to-Many
         modelBuilder.Entity<Enseignant>()
             .HasMany(e => e.Matieres)
             .WithMany(m => m.Enseignants);
 
-        // Index pour optimisation
+        modelBuilder.Entity<Reservation>()
+            .HasOne(r => r.Demandeur)
+            .WithMany()
+            .HasForeignKey(r => r.DemandeurId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Seance>()
             .HasIndex(s => new { s.Date, s.CreneauId, s.SalleId });
 

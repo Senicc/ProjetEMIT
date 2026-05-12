@@ -1,0 +1,57 @@
+@model IEnumerable<ProjetEMIT.Models.Matiere>
+
+    @{
+    ViewData["Title"] = "Gestion des Matières - EMIT";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-book"></i> Gestion des Matières</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Nouvelle Matière
+        </a>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Code</th>
+                <th>Nom de la Matière</th>
+                <th>Filière</th>
+                <th>Coefficient</th>
+                <th>Heures</th>
+                <th>Enseignants</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+        {
+            <tr>
+                <td><strong>@item.Code</strong></td>
+                <td>@item.Nom</td>
+                <td>@item.Filiere?.Nom</td>
+                <td>@item.Coefficient</td>
+                <td>@item.NbreHeures h</td>
+                <td>
+                    @if (item.Enseignants.Any())
+                    {
+                    <small>@string.Join(", ", item.Enseignants.Select(e => e.Prenom + " " + e.Nom))</small>
+                    }
+                    else
+                    {
+                    <span class="text-muted">Aucun enseignant assigné</span>
+                    }
+                </td>
+                <td>
+                    <form asp-action="Delete" asp-route-id="@item.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Supprimer cette matière ?')">
+                            Supprimer
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>

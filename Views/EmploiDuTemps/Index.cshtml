@@ -1,0 +1,105 @@
+@{
+    ViewData["Title"] = "Emplois du Temps - EMIT";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-calendar-alt"></i> Emplois du Temps - EMIT</h4>
+        @if (User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique"))
+        {
+            <a asp-action="Create" class="btn btn-light btn-sm"><i class="fas fa-plus"></i> Nouvelle séance</a>
+        }
+    </div>
+    <div class="card-body">
+        <!-- Filtres -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Filtrer par Classe</label>
+                <select id="classeFilter" class="form-select">
+                    <option value="">Toutes les classes</option>
+                    <!-- Rempli dynamiquement via JS ou ViewBag -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filtrer par Salle</label>
+                <select id="salleFilter" class="form-select">
+                    <option value="">Toutes les salles</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filtrer par Enseignant</label>
+                <select id="enseignantFilter" class="form-select">
+                    <option value="">Tous les enseignants</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button id="btnReset" class="btn btn-secondary w-100">Réinitialiser Filtres</button>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <a asp-action="ExportPdf" class="btn btn-danger w-100" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Exporter PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Calendrier -->
+        <div id="calendar" style="min-height: 700px;"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let calendar;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                locale: 'fr',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                slotMinTime: '08:00:00',
+                slotMaxTime: '19:00:00',
+                allDaySlot: false,
+                editable: false,
+                selectable: true,
+                nowIndicator: true,
+
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    const classeId = document.getElementById('classeFilter').value;
+                    const salleId = document.getElementById('salleFilter').value;
+                    const enseignantId = document.getElementById('enseignantFilter').value;
+
+                    fetch(`/EmploiDuTemps/GetEvents?start=${fetchInfo.startStr}&end=${fetchInfo.endStr}&classeId=${classeId}&salleId=${salleId}&enseignantId=${enseignantId}`)
+                        .then(response => response.json())
+                        .then(data => successCallback(data))
+                        .catch(error => failureCallback(error));
+                },
+
+                eventClick: function (info) {
+                    const props = info.event.extendedProps;
+                    alert(`Matière : ${props.matiere}\nClasse : ${props.classe}\nSalle : ${props.salle}\nEnseignant : ${props.enseignant}\nType : ${props.typeSeance}`);
+                }
+            });
+
+            calendar.render();
+
+            // Recharger le calendrier quand on change un filtre
+            document.getElementById('classeFilter').addEventListener('change', () => calendar.refetchEvents());
+            document.getElementById('salleFilter').addEventListener('change', () => calendar.refetchEvents());
+            document.getElementById('enseignantFilter').addEventListener('change', () => calendar.refetchEvents());
+
+            document.getElementById('btnReset').addEventListener('click', () => {
+                document.getElementById('classeFilter').value = '';
+                document.getElementById('salleFilter').value = '';
+                document.getElementById('enseignantFilter').value = '';
+                calendar.refetchEvents();
+            });
+        });
+    </script>
+}

@@ -1,0 +1,57 @@
+@model IEnumerable<ProjetEMIT.Models.Enseignant>
+
+    @{
+    ViewData["Title"] = "Gestion des Enseignants - EMIT";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-chalkboard-teacher"></i> Gestion des Enseignants</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Nouvel Enseignant
+        </a>
+    </div>
+
+    <table class="table table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Nom Complet</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Spécialité</th>
+                <th>Matières</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+        {
+            <tr>
+                <td><strong>@item.Prenom @item.Nom</strong></td>
+                <td>@item.Email</td>
+                <td>@item.Telephone</td>
+                <td>@item.Specialite</td>
+                <td>
+                    @if (item.Matieres.Any())
+                    {
+                    <span class="badge bg-primary">@string.Join(", ", item.Matieres.Select(m => m.Nom))</span>
+                    }
+                    else
+                    {
+                    <span class="text-muted">Aucune matière assignée</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Détails</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Modifier</a>
+                    <form asp-action="Delete" asp-route-id="@item.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Supprimer cet enseignant ?')">
+                            Supprimer
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjetEMIT")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+724829075d9ebea7c02966ef25ef3c29021a927b")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjetEMIT")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjetEMIT")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,4 +1,8 @@
-﻿public class RegisterViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjetEMIT.ViewModels;
+
+public class RegisterViewModel
 {
     [Required]
     [Display(Name = "Nom")]

@@ -1,0 +1,47 @@
+@model CreateUserViewModel
+@{
+    ViewData["Title"] = "Créer un utilisateur";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4">Nouvel utilisateur</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="Nom" class="form-label"></label>
+        <input asp-for="Nom" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Prenom" class="form-label"></label>
+        <input asp-for="Prenom" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Role" class="form-label">Rôle</label>
+        <select asp-for="Role" class="form-select">
+            <option value="">-- Choisir --</option>
+            @foreach (var r in ViewBag.Roles as List<string> ?? new List<string>())
+            {
+                <option value="@r">@r</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label asp-for="EnseignantId" class="form-label">ID Enseignant (optionnel)</label>
+        <input asp-for="EnseignantId" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Créer</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
