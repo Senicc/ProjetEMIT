@@ -1,66 +1,135 @@
-@model IEnumerable<ProjetEMIT.Models.Reservation>
+ï»¿@using ProjetEMIT.Models
+@using ProjetEMIT.Models.Enums
+@model IEnumerable<Reservation>
 
-    @{
-    ViewData["Title"] = "Gestion des Réservations - EMIT";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    }
+@{
+    ViewData["Title"] = "Gestion des R&eacute;servations";
+}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-calendar-check"></i> Réservations des Salles</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="fas fa-plus"></i> Nouvelle Réservation
+<div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+    <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
+        <div>
+            <h2 class="text-xl font-bold text-gray-800">Liste des R&eacute;servations</h2>
+            <p class="text-sm text-gray-500 mt-1">G&eacute;rez les demandes de r&eacute;servation de salles.</p>
+        </div>
+        <a asp-action="Create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-md shadow-blue-500/20 transition-all flex items-center">
+            <i class="fas fa-plus mr-2"></i> Nouvelle R&eacute;servation
         </a>
     </div>
 
-    <table class="table table-hover table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Salle</th>
-                <th>Date</th>
-                <th>Horaire</th>
-                <th>Motif</th>
-                <th>Demandeur</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Salle.NomSalle</td>
-                <td>@item.Date.ToString("dd/MM/yyyy")</td>
-                <td>@item.HeureDebut - @item.HeureFin</td>
-                <td>@item.Motif</td>
-                <td>@item.Demandeur?.Nom @item.Demandeur?.Prenom</td>
-                <td>
-                    @switch (item.Statut)
-                    {
-                        case "Validee": <span class="badge bg-success">Validée</span> break;
-                        case "Refusee": <span class="badge bg-danger">Refusée</span> break;
-                        case "Annulee": <span class="badge bg-secondary">Annulée</span> break;
-                        default: <span class="badge bg-warning">En Attente</span> break;
-                    }
-                </td>
-                <td>
-                    @if (item.Statut == "EnAttente" && (User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique")))
-                    {
-                    <form asp-action="Valider" method="post" asp-route-id="@item.Id" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-success">Valider</button>
-                    </form>
-                    <form asp-action="Refuser" method="post" asp-route-id="@item.Id" class="d-inline ms-1">
-                        <input type="text" name="motifRefus" class="form-control form-control-sm d-inline-block" style="width:140px;display:inline-block!important" placeholder="Motif refus" />
-                        <button type="submit" class="btn btn-sm btn-danger">Refuser</button>
-                    </form>
-                    }
-                    @if (item.Statut == "EnAttente" && item.Demandeur?.UserName == User.Identity?.Name)
-                    {
-                    <form asp-action="Annuler" method="post" asp-route-id="@item.Id" class="d-inline ms-1">
-                        <button type="submit" class="btn btn-sm btn-warning">Annuler</button>
-                    </form>
-                    }
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                    <th class="p-4 font-medium">Salle</th>
+                    <th class="p-4 font-medium">Date & Heure</th>
+                    <th class="p-4 font-medium">Demandeur</th>
+                    <th class="p-4 font-medium">Motif</th>
+                    <th class="p-4 font-medium">Statut</th>
+                    <th class="p-4 font-medium text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4">
+                            <div class="font-semibold text-gray-800">@item.Salle?.NomSalle</div>
+                            <div class="text-xs text-gray-500">Capacit&eacute;: @item.Salle?.Capacite</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="font-medium text-gray-800"><i class="far fa-calendar-alt text-gray-400 mr-1"></i> @item.Date.ToString("dd/MM/yyyy")</div>
+                            <div class="text-xs text-gray-500 mt-0.5"><i class="far fa-clock text-gray-400 mr-1"></i> @item.HeureDebut - @item.HeureFin</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-bold text-xs">
+                                    @(item.Demandeur?.Prenom?.Length > 0 ? item.Demandeur?.Prenom.Substring(0,1) : "U")@(item.Demandeur?.Nom?.Length > 0 ? item.Demandeur?.Nom.Substring(0,1) : "")
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-800">@item.Demandeur?.Prenom @item.Demandeur?.Nom</div>
+                                    <div class="text-xs text-gray-500">@item.DateDemande.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 text-gray-600 max-w-xs truncate" title="@item.Motif">
+                            @item.Motif
+                        </td>
+                        <td class="p-4">
+                            @switch (item.Statut)
+                            {
+                                case ReservationStatus.EnAttente: 
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                        <i class="fas fa-hourglass-half mr-1.5"></i> En attente
+                                    </span> 
+                                    break;
+                                case ReservationStatus.Validee: 
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                        <i class="fas fa-check-circle mr-1.5"></i> Valid&eacute;e
+                                    </span> 
+                                    break;
+                                case ReservationStatus.Refusee: 
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                                        <i class="fas fa-times-circle mr-1.5"></i> Refus&eacute;e
+                                    </span> 
+                                    break;
+                                case ReservationStatus.Annulee: 
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                        <i class="fas fa-ban mr-1.5"></i> Annul&eacute;e
+                                    </span> 
+                                    break;
+                            }
+                        </td>
+                        <td class="p-4 text-right space-x-2">
+                            @if (item.Statut == ReservationStatus.EnAttente && (User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique")))
+                            {
+                                <form asp-action="Valider" method="post" class="inline-block">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-colors" title="Valider">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <button type="button" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors" title="Refuser" onclick="document.getElementById('refus-@item.Id').classList.toggle('hidden')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                
+                                <div id="refus-@item.Id" class="hidden absolute right-10 mt-2 p-4 bg-white shadow-xl rounded-lg border border-gray-200 z-10 w-64 text-left">
+                                    <form asp-action="Refuser" method="post">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Motif du refus</label>
+                                        <input type="text" name="motifRefus" required class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 mb-2 p-2 border" placeholder="Raison..." />
+                                        <div class="flex justify-end space-x-2">
+                                            <button type="button" onclick="document.getElementById('refus-@item.Id').classList.add('hidden')" class="text-xs px-3 py-1 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded">Annuler</button>
+                                            <button type="submit" class="text-xs px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded">Confirmer</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            }
+
+                            @if (item.Statut == ReservationStatus.EnAttente && item.Demandeur?.UserName == User.Identity?.Name)
+                            {
+                                <form asp-action="Annuler" method="post" class="inline-block">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-colors" title="Annuler ma demande" onclick="return confirm('Annuler cette r&eacute;servation ?');">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                
+                @if(!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-gray-500">
+                            <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                            <p>Aucune r&eacute;servation trouv&eacute;e.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

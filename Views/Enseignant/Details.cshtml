@@ -1,41 +1,128 @@
-@model ProjetEMIT.Models.Enseignant
+﻿@model ProjetEMIT.Models.Enseignant
 @{
-    ViewData["Title"] = "Détail enseignant";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "D&eacute;tail Enseignant";
     var seances = ViewBag.Seances as IEnumerable<ProjetEMIT.Models.Seance>;
 }
 
-<div class="mb-3">
-    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
+<div class="max-w-5xl mx-auto space-y-6">
+    <!-- Header Actions -->
+    <div class="flex justify-between items-center">
+        <a asp-action="Index" class="text-gray-500 hover:text-gray-700 transition-colors flex items-center text-sm font-medium">
+            <i class="fas fa-arrow-left mr-2"></i> Retour aux enseignants
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center">
+            <i class="fas fa-edit mr-2"></i> Modifier le profil
+        </a>
+    </div>
+
+    <!-- Main Profile Card -->
+    <div class="bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden">
+        <div class="h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+        <div class="px-8 pb-8">
+            <div class="relative flex justify-between items-end -mt-12 mb-6">
+                <div class="w-24 h-24 rounded-xl bg-white p-1 shadow-lg">
+                    <div class="w-full h-full rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-3xl font-bold">
+                        @Model.Prenom.Substring(0, 1)@Model.Nom.Substring(0, 1)
+                    </div>
+                </div>
+                <div class="pb-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        @Model.Specialite
+                    </span>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-900">@Model.Prenom @Model.Nom</h2>
+            <p class="text-gray-500 text-sm mt-1 mb-6">Professeur - @Model.Specialite</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">
+                <div class="flex items-center text-gray-600">
+                    <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center mr-4 text-gray-400">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Email</p>
+                        <a href="mailto:@Model.Email" class="font-medium text-indigo-600 hover:underline">@Model.Email</a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center text-gray-600">
+                    <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center mr-4 text-gray-400">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">T&eacute;l&eacute;phone</p>
+                        <p class="font-medium text-gray-900">@(string.IsNullOrEmpty(Model.Telephone) ? "Non renseign&eacute;" : Model.Telephone)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider">Mati&egrave;res enseign&eacute;es</h3>
+                <div class="flex flex-wrap gap-2">
+                    @if (Model.Matieres != null && Model.Matieres.Any())
+                    {
+                        @foreach(var mat in Model.Matieres)
+                        {
+                            <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 flex items-center">
+                                <i class="fas fa-book text-indigo-400 mr-2"></i> @mat.Nom
+                            </span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-sm text-gray-500 italic">Aucune mati&egrave;re assign&eacute;e</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Section -->
+    <div class="bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-calendar-alt text-indigo-500 mr-2"></i> Historique et s&eacute;ances pr&eacute;vues
+            </h3>
+        </div>
+        
+        <div class="p-0">
+            @if (seances != null && seances.Any())
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                <th class="py-3 px-6 font-medium">Date</th>
+                                <th class="py-3 px-6 font-medium">Mati&egrave;re</th>
+                                <th class="py-3 px-6 font-medium">Classe</th>
+                                <th class="py-3 px-6 font-medium">Salle</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach (var s in seances.OrderByDescending(x => x.Date))
+                            {
+                                <tr class="hover:bg-gray-50 transition-colors text-sm">
+                                    <td class="py-3 px-6 whitespace-nowrap font-medium text-gray-900">@s.Date.ToString("dd MMM yyyy")</td>
+                                    <td class="py-3 px-6 text-gray-600">@s.Matiere.Nom</td>
+                                    <td class="py-3 px-6">
+                                        <span class="inline-block px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">@s.Classe.Nom</span>
+                                    </td>
+                                    <td class="py-3 px-6 text-gray-500">@s.Salle.NomSalle</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-8 text-center text-gray-500">
+                    <i class="fas fa-calendar-times text-4xl mb-4 text-gray-300"></i>
+                    <p>Aucune s&eacute;ance n'a &eacute;t&eacute; planifi&eacute;e pour cet enseignant.</p>
+                </div>
+            }
+        </div>
+    </div>
 </div>
 
-<div class="card shadow mb-4">
-    <div class="card-header bg-primary text-white">
-        <h4>@Model.Prenom @Model.Nom</h4>
-    </div>
-    <div class="card-body">
-        <p><strong>Email :</strong> @Model.Email</p>
-        <p><strong>Téléphone :</strong> @Model.Telephone</p>
-        <p><strong>Spécialité :</strong> @Model.Specialite</p>
-        <p><strong>Matières :</strong> @string.Join(", ", Model.Matieres.Select(m => m.Nom))</p>
-    </div>
-</div>
-
-@if (seances != null && seances.Any())
-{
-    <h5>Séances (toutes périodes)</h5>
-    <table class="table table-sm">
-        <thead><tr><th>Date</th><th>Matière</th><th>Classe</th><th>Salle</th></tr></thead>
-        <tbody>
-        @foreach (var s in seances.OrderBy(x => x.Date))
-        {
-            <tr>
-                <td>@s.Date.ToString("dd/MM/yyyy")</td>
-                <td>@s.Matiere.Nom</td>
-                <td>@s.Classe.Nom</td>
-                <td>@s.Salle.NomSalle</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}

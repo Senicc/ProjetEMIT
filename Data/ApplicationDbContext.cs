@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjetEMIT.Models;
+using ProjetEMIT.Models.Enums;
 
 namespace ProjetEMIT.Data;
 
@@ -32,10 +33,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(r => r.DemandeurId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<Seance>()
-            .HasIndex(s => new { s.Date, s.CreneauId, s.SalleId });
+        
 
-        modelBuilder.Entity<Seance>()
-            .HasIndex(s => new { s.Date, s.CreneauId, s.EnseignantId });
+        modelBuilder.Entity<Reservation>()
+            .Property(r => r.Statut)
+            .HasConversion<string>();
     }
 }
+
+

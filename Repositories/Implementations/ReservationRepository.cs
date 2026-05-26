@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProjetEMIT.Data;
 using ProjetEMIT.Models;
+using ProjetEMIT.Models.Enums;
 using ProjetEMIT.Repositories.Interfaces;
 
 namespace ProjetEMIT.Repositories.Implementations;
@@ -35,8 +36,8 @@ public class ReservationRepository : BaseRepository<Reservation>, IReservationRe
         return await _context.Reservations.AnyAsync(r =>
             r.SalleId == salleId &&
             r.Date == date &&
-            r.Statut != "Refusee" &&
-            r.Statut != "Annulee" &&
+            r.Statut != ReservationStatus.Refusee &&
+            r.Statut != ReservationStatus.Annulee &&
             r.HeureDebut < fin &&
             r.HeureFin > debut &&
             (excludeReservationId == null || r.Id != excludeReservationId));
@@ -45,6 +46,6 @@ public class ReservationRepository : BaseRepository<Reservation>, IReservationRe
     public Task<bool> ExistsActiveForSalleAsync(int salleId) =>
         _context.Reservations.AnyAsync(r =>
             r.SalleId == salleId &&
-            r.Statut != "Refusee" &&
-            r.Statut != "Annulee");
+            r.Statut != ReservationStatus.Refusee &&
+            r.Statut != ReservationStatus.Annulee);
 }

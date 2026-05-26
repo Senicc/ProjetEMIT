@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProjetEMIT.ViewModels;
 
@@ -9,8 +9,12 @@ public class SeanceViewModel
     public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     [Required]
-    [Display(Name = "Créneau")]
-    public int CreneauId { get; set; }
+    [Display(Name = "Heure de d&eacute;but")]
+    public TimeSpan HeureDebut { get; set; }
+
+    [Required]
+    [Display(Name = "Heure de fin")]
+    public TimeSpan HeureFin { get; set; }
 
     [Required]
     [Display(Name = "Salle")]
@@ -21,7 +25,7 @@ public class SeanceViewModel
     public int EnseignantId { get; set; }
 
     [Required]
-    [Display(Name = "Matière")]
+    [Display(Name = "Mati&egrave;re")]
     public int MatiereId { get; set; }
 
     [Required]
@@ -29,6 +33,6 @@ public class SeanceViewModel
     public int ClasseId { get; set; }
 
     [Required]
-    [Display(Name = "Type de séance")]
+    [Display(Name = "Type de s&eacute;ance")]
     public string TypeSeance { get; set; } = "Cours";
 }

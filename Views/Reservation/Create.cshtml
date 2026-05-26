@@ -1,0 +1,81 @@
+﻿@model ProjetEMIT.ViewModels.ReservationViewModel
+
+@{
+    ViewData["Title"] = "Nouvelle R&eacute;servation";
+}
+
+<div class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+        <h2 class="text-2xl font-bold flex items-center">
+            <i class="fas fa-calendar-plus mr-3"></i> R&eacute;server une Salle
+        </h2>
+        <p class="text-blue-100 mt-2 opacity-90">Remplissez le formulaire ci-dessous pour soumettre une demande de r&eacute;servation.</p>
+    </div>
+
+    <div class="p-8">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 mb-4 text-sm font-medium bg-red-50 p-3 rounded-lg border border-red-200"></div>
+            
+            <div class="space-y-6">
+                <!-- Salle Selection -->
+                <div>
+                    <label asp-for="SalleId" class="block text-sm font-semibold text-gray-700 mb-2">Salle souhait&eacute;e</label>
+                    <div class="relative">
+                        <select asp-for="SalleId" class="w-full pl-4 pr-10 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
+                            <option value="">-- S&eacute;lectionnez une salle --</option>
+                            @if (ViewBag.Salles != null)
+                            {
+                                foreach (var salle in ViewBag.Salles)
+                                {
+                                    <option value="@salle.Id">@salle.NomSalle (Capacit&eacute;: @salle.Capacite - @salle.TypeSalle)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <span asp-validation-for="SalleId" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Date Selection -->
+                <div>
+                    <label asp-for="Date" class="block text-sm font-semibold text-gray-700 mb-2">Date de r&eacute;servation</label>
+                    <input asp-for="Date" type="date" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required />
+                    <span asp-validation-for="Date" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Time Selection -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="HeureDebut" class="block text-sm font-semibold text-gray-700 mb-2">Heure de d&eacute;but</label>
+                        <input asp-for="HeureDebut" type="time" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required />
+                        <span asp-validation-for="HeureDebut" class="text-red-500 text-xs mt-1 block"></span>
+                    </div>
+                    <div>
+                        <label asp-for="HeureFin" class="block text-sm font-semibold text-gray-700 mb-2">Heure de fin</label>
+                        <input asp-for="HeureFin" type="time" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required />
+                        <span asp-validation-for="HeureFin" class="text-red-500 text-xs mt-1 block"></span>
+                    </div>
+                </div>
+
+                <!-- Motif -->
+                <div>
+                    <label asp-for="Motif" class="block text-sm font-semibold text-gray-700 mb-2">Motif de la r&eacute;servation</label>
+                    <textarea asp-for="Motif" rows="3" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Ex: Cours de rattrapage, R&eacute;union p&eacute;dagogique..." required></textarea>
+                    <span asp-validation-for="Motif" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+            </div>
+
+            <div class="mt-8 flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
+                <a asp-action="Index" class="px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                    Annuler
+                </a>
+                <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg shadow-blue-500/30 transition-all flex items-center">
+                    <i class="fas fa-paper-plane mr-2"></i> Soumettre
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

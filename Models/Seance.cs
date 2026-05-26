@@ -12,8 +12,9 @@ namespace ProjetEMIT.Models
     {
         public int Id { get; set; }
         public DateOnly Date { get; set; }
-        public int CreneauId { get; set; }
-        public Creneau Creneau { get; set; } = null!;
+        
+        public TimeSpan HeureDebut { get; set; }
+        public TimeSpan HeureFin { get; set; }
 
         public int SalleId { get; set; }
         public Salle Salle { get; set; } = null!;

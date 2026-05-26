@@ -1,110 +1,120 @@
-@model SeanceViewModel
+﻿@model ProjetEMIT.ViewModels.SeanceViewModel
+
 @{
-    ViewData["Title"] = "Nouvelle séance";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var salles = ViewBag.Salles as IEnumerable<ProjetEMIT.Models.Salle>;
-    var enseignants = ViewBag.Enseignants as IEnumerable<ProjetEMIT.Models.Enseignant>;
-    var creneaux = ViewBag.Creneaux as IEnumerable<ProjetEMIT.Models.Creneau>;
-    var matieres = ViewBag.Matieres as IEnumerable<ProjetEMIT.Models.Matiere>;
-    var classes = ViewBag.Classes as IEnumerable<ProjetEMIT.Models.Classe>;
+    ViewData["Title"] = "Ajouter une S&eacute;ance";
 }
 
-<h2 class="mb-4">Planifier une séance</h2>
-
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
-
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <label asp-for="Date" class="form-label"></label>
-            <input asp-for="Date" class="form-control" type="date" />
-        </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="CreneauId" class="form-label"></label>
-            <select asp-for="CreneauId" class="form-select">
-                <option value="">-- Créneau --</option>
-                @if (creneaux != null)
-                {
-                    foreach (var c in creneaux)
-                    {
-                        <option value="@c.Id">@c.Nom (@c.HeureDebut - @c.HeureFin)</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="TypeSeance" class="form-label"></label>
-            <select asp-for="TypeSeance" class="form-select">
-                <option>Cours</option>
-                <option>TD</option>
-                <option>TP</option>
-                <option>Examen</option>
-            </select>
-        </div>
+<div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden">
+    <div class="bg-gradient-to-r from-cyan-600 to-cyan-800 p-6 text-white">
+        <h2 class="text-2xl font-bold flex items-center">
+            <i class="fas fa-calendar-plus mr-3"></i> Planifier une S&eacute;ance
+        </h2>
+        <p class="text-cyan-100 mt-2 opacity-90">Ajoutez un nouveau cours &agrave; l'emploi du temps.</p>
     </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="SalleId" class="form-label"></label>
-            <select asp-for="SalleId" class="form-select">
-                <option value="">-- Salle --</option>
-                @if (salles != null)
-                {
-                    foreach (var s in salles)
-                    {
-                        <option value="@s.Id">@s.NomSalle</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label asp-for="EnseignantId" class="form-label"></label>
-            <select asp-for="EnseignantId" class="form-select">
-                <option value="">-- Enseignant --</option>
-                @if (enseignants != null)
-                {
-                    foreach (var e in enseignants)
-                    {
-                        <option value="@e.Id">@e.Prenom @e.Nom</option>
-                    }
-                }
-            </select>
-        </div>
-    </div>
+    <div class="p-8">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 mb-4 text-sm font-medium bg-red-50 p-3 rounded-lg border border-red-200"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Date -->
+                <div>
+                    <label asp-for="Date" class="block text-sm font-semibold text-gray-700 mb-2">Date de la s&eacute;ance</label>
+                    <input asp-for="Date" type="date" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required />
+                    <span asp-validation-for="Date" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="MatiereId" class="form-label"></label>
-            <select asp-for="MatiereId" class="form-select">
-                <option value="">-- Matière --</option>
-                @if (matieres != null)
-                {
-                    foreach (var m in matieres)
-                    {
-                        <option value="@m.Id">@m.Code — @m.Nom</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label asp-for="ClasseId" class="form-label"></label>
-            <select asp-for="ClasseId" class="form-select">
-                <option value="">-- Classe --</option>
-                @if (classes != null)
-                {
-                    foreach (var c in classes)
-                    {
-                        <option value="@c.Id">@c.Nom (@c.Filiere?.Code — @c.Niveau?.Nom)</option>
-                    }
-                }
-            </select>
-        </div>
-    </div>
+                <!-- Type S&eacute;ance -->
+                <div>
+                    <label asp-for="TypeSeance" class="block text-sm font-semibold text-gray-700 mb-2">Type de S&eacute;ance</label>
+                    <select asp-for="TypeSeance" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <option value="Cours">Cours</option>
+                        <option value="TD">Travaux Dirig&eacute;s (TD)</option>
+                        <option value="TP">Travaux Pratiques (TP)</option>
+                        <option value="Examen">Examen</option>
+                    </select>
+                    <span asp-validation-for="TypeSeance" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
 
-    <button type="submit" class="btn btn-primary">Enregistrer</button>
-    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
-</form>
+                <!-- Heure de d&eacute;but -->
+                <div>
+                    <label asp-for="HeureDebut" class="block text-sm font-semibold text-gray-700 mb-2">Heure de d&eacute;but</label>
+                    <input asp-for="HeureDebut" type="time" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required />
+                    <span asp-validation-for="HeureDebut" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Heure de fin -->
+                <div>
+                    <label asp-for="HeureFin" class="block text-sm font-semibold text-gray-700 mb-2">Heure de fin</label>
+                    <input asp-for="HeureFin" type="time" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required />
+                    <span asp-validation-for="HeureFin" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Mati&egrave;re -->
+                <div>
+                    <label asp-for="MatiereId" class="block text-sm font-semibold text-gray-700 mb-2">Mati&egrave;re</label>
+                    <select asp-for="MatiereId" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <option value="">-- S&eacute;lectionner la mati&egrave;re --</option>
+                        @foreach (var m in ViewBag.Matieres)
+                        {
+                            <option value="@m.Id">@m.Code - @m.Nom</option>
+                        }
+                    </select>
+                    <span asp-validation-for="MatiereId" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Enseignant -->
+                <div>
+                    <label asp-for="EnseignantId" class="block text-sm font-semibold text-gray-700 mb-2">Enseignant</label>
+                    <select asp-for="EnseignantId" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <option value="">-- S&eacute;lectionner le professeur --</option>
+                        @foreach (var p in ViewBag.Enseignants)
+                        {
+                            <option value="@p.Id">@p.Prenom @p.Nom (@p.Specialite)</option>
+                        }
+                    </select>
+                    <span asp-validation-for="EnseignantId" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Salle -->
+                <div>
+                    <label asp-for="SalleId" class="block text-sm font-semibold text-gray-700 mb-2">Salle</label>
+                    <select asp-for="SalleId" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <option value="">-- S&eacute;lectionner la salle --</option>
+                        @foreach (var s in ViewBag.Salles)
+                        {
+                            <option value="@s.Id">@s.NomSalle (Capacit&eacute;: @s.Capacite)</option>
+                        }
+                    </select>
+                    <span asp-validation-for="SalleId" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Classe -->
+                <div>
+                    <label asp-for="ClasseId" class="block text-sm font-semibold text-gray-700 mb-2">Classe</label>
+                    <select asp-for="ClasseId" class="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <option value="">-- S&eacute;lectionner la classe --</option>
+                        @foreach (var cl in ViewBag.Classes)
+                        {
+                            <option value="@cl.Id">@cl.Nom</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ClasseId" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+            </div>
+
+            <div class="mt-8 flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
+                <a asp-action="Index" class="px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                    Annuler
+                </a>
+                <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg shadow-lg shadow-cyan-500/30 transition-all flex items-center">
+                    <i class="fas fa-save mr-2"></i> Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

@@ -485,7 +485,7 @@ namespace ProjetEMIT.Data.Migrations
                     b.Property<int>("ClasseId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("CreneauId")
+                    b.Property<int?>("CreneauId")
                         .HasColumnType("integer");
 
                     b.Property<DateOnly>("Date")
@@ -493,6 +493,12 @@ namespace ProjetEMIT.Data.Migrations
 
                     b.Property<int>("EnseignantId")
                         .HasColumnType("integer");
+
+                    b.Property<TimeSpan>("HeureDebut")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("HeureFin")
+                        .HasColumnType("interval");
 
                     b.Property<int>("MatiereId")
                         .HasColumnType("integer");
@@ -515,10 +521,6 @@ namespace ProjetEMIT.Data.Migrations
                     b.HasIndex("MatiereId");
 
                     b.HasIndex("SalleId");
-
-                    b.HasIndex("Date", "CreneauId", "EnseignantId");
-
-                    b.HasIndex("Date", "CreneauId", "SalleId");
 
                     b.ToTable("Seances");
                 });
@@ -655,11 +657,9 @@ namespace ProjetEMIT.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjetEMIT.Models.Creneau", "Creneau")
+                    b.HasOne("ProjetEMIT.Models.Creneau", null)
                         .WithMany("Seances")
-                        .HasForeignKey("CreneauId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreneauId");
 
                     b.HasOne("ProjetEMIT.Models.Enseignant", "Enseignant")
                         .WithMany("Seances")
@@ -680,8 +680,6 @@ namespace ProjetEMIT.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Classe");
-
-                    b.Navigation("Creneau");
 
                     b.Navigation("Enseignant");
 

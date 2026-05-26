@@ -1,4 +1,4 @@
-using QuestPDF.Fluent;
+﻿using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using ProjetEMIT.Models;
@@ -69,10 +69,10 @@ public class RapportService : IRapportService
                         HeaderCell(header.Cell(), "Type");
                     });
 
-                    foreach (var seance in seances.OrderBy(s => s.Date).ThenBy(s => s.Creneau.HeureDebut))
+                    foreach (var seance in seances.OrderBy(s => s.Date).ThenBy(s => s.HeureDebut))
                     {
                         BodyCell(table.Cell(), seance.Date.ToString("dd/MM/yyyy"));
-                        BodyCell(table.Cell(), $"{seance.Creneau.HeureDebut} - {seance.Creneau.HeureFin}");
+                        BodyCell(table.Cell(), $"{seance.HeureDebut} - {seance.HeureFin}");
                         BodyCell(table.Cell(), seance.Matiere.Nom);
                         BodyCell(table.Cell(), $"{seance.Enseignant.Prenom} {seance.Enseignant.Nom}");
                         BodyCell(table.Cell(), seance.Classe.Nom);
@@ -105,3 +105,5 @@ public class RapportService : IRapportService
             .Text(value);
     }
 }
+
+

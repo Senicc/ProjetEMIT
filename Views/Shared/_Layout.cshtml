@@ -3,169 +3,178 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EMIT</title>
+    <title>@ViewData["Title"] - EMIT Premium</title>
 
-    <!-- Bootstrap 5 + Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS (CDN for quick premium styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
 
     <style>
-        :root {
-            --primary-color: #1e3a8a;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
         }
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(180deg, #1e3a8a, #0f2b6b);
-            color: white;
+        .glass-sidebar {
+            background: rgba(15, 23, 42, 0.95); /* Slate 900 */
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .nav-link {
-            color: #ddd !important;
-            transition: all 0.3s;
+        .nav-item-hover {
+            transition: all 0.2s ease-in-out;
         }
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255,255,255,0.15);
-            color: white !important;
-            border-left: 4px solid #60a5fa;
+        .nav-item-hover:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
         }
-        .main-content {
-            margin-left: 260px;
-            padding: 20px;
+        .nav-item-active {
+            background-color: rgba(59, 130, 246, 0.2); /* Blue 500 with opacity */
+            border-left: 4px solid #3b82f6;
+            color: #60a5fa !important;
         }
-        .brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden text-gray-800">
 
-    <div class="d-flex">
-        <!-- ==================== SIDEBAR ==================== -->
-        <div class="sidebar p-3" style="width: 260px; position: fixed; height: 100vh; overflow-y: auto;">
-            <div class="text-center mb-4">
-                <h3 class="brand">
-                    <i class="fas fa-university"></i> EMIT
-                </h3>
-                <p class="small text-light">École de Management et d’Innovation Technologique</p>
+    <!-- SIDEBAR -->
+    <aside class="glass-sidebar w-64 h-full text-white flex flex-col shadow-2xl z-20">
+        <div class="p-6 flex flex-col items-center border-b border-gray-700">
+            <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-2xl font-bold mb-3 shadow-lg shadow-blue-500/50">
+                <i class="fas fa-university text-white"></i>
             </div>
-
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin") ? "active" : "")" 
-                       asp-controller="Admin" asp-action="Index">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>
-                </li>
-
-                <li class="nav-item mt-3">
-                    <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Salle") ? "active" : "")" 
-                       asp-controller="Salle" asp-action="Index">
-                        <i class="fas fa-door-open"></i> Salles
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Enseignant") ? "active" : "")" 
-                       asp-controller="Enseignant" asp-action="Index">
-                        <i class="fas fa-chalkboard-teacher"></i> Enseignants
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="EmploiDuTemps" asp-action="Index">
-                        <i class="fas fa-calendar-alt"></i> Emplois du Temps
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Reservation" asp-action="Index">
-                        <i class="fas fa-calendar-check"></i> Réservations
-                    </a>
-                </li>
-
-                <li class="nav-item mt-3">
-                    <a class="nav-link" asp-controller="Matiere" asp-action="Index">
-                        <i class="fas fa-book"></i> Matières
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Classe" asp-action="Index">
-                        <i class="fas fa-users"></i> Classes & Filieres
-                    </a>
-                </li>
-
-                @if (User.IsInRole("Administrateur"))
-                {
-                    <li class="nav-item mt-4">
-                        <a class="nav-link" asp-controller="UserManagement" asp-action="Index">
-                            <i class="fas fa-user-plus"></i> Gestion Utilisateurs
-                        </a>
-                    </li>
-                }
-
-                <li class="nav-item mt-auto pt-4">
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                        <button type="submit" class="nav-link text-danger btn btn-link text-start w-100 p-2 border-0"
-                                onclick="return confirm('Voulez-vous vraiment vous déconnecter ?');">
-                            <i class="fas fa-sign-out-alt"></i> Déconnexion
-                        </button>
-                    </form>
-                </li>
-            </ul>
+            <h2 class="text-xl font-bold tracking-wider">EMIT</h2>
+            <p class="text-xs text-gray-400 mt-1 text-center">Management & Innovation</p>
         </div>
 
-        <!-- ==================== CONTENU PRINCIPAL ==================== -->
-        <div class="main-content flex-grow-1">
-            <!-- Navbar Top -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 px-4">
-                <div class="container-fluid">
-                    <span class="navbar-brand fw-bold text-primary">Système de Gestion EMIT</span>
-                    
-                    <div class="d-flex align-items-center">
-                        <span class="me-3 text-muted">
-                            <i class="fas fa-user-circle"></i> 
-                            @User.Identity?.Name
-                        </span>
-                        @{
-                            var roles = User.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
-                        }
-                        @if (roles.Count > 0)
-                        {
-                            <span class="badge bg-primary">@string.Join(", ", roles)</span>
-                        }
-                    </div>
-                </div>
-            </nav>
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            <a href="@Url.Action("Index", "Admin")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin") ? "nav-item-active" : "")">
+                <i class="fas fa-chart-pie w-6"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            
+            <a href="@Url.Action("Index", "Salle")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Salle") ? "nav-item-active" : "")">
+                <i class="fas fa-door-open w-6"></i>
+                <span class="font-medium">Salles</span>
+            </a>
 
-            <!-- Messages TempData -->
+            <a href="@Url.Action("Index", "Enseignant")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Enseignant") ? "nav-item-active" : "")">
+                <i class="fas fa-chalkboard-teacher w-6"></i>
+                <span class="font-medium">Enseignants</span>
+            </a>
+
+            <a href="@Url.Action("Index", "EmploiDuTemps")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "EmploiDuTemps") ? "nav-item-active" : "")">
+                <i class="fas fa-calendar-alt w-6"></i>
+                <span class="font-medium">Emplois du Temps</span>
+            </a>
+
+            <a href="@Url.Action("Index", "Reservation")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Reservation") ? "nav-item-active" : "")">
+                <i class="fas fa-bookmark w-6"></i>
+                <span class="font-medium">R&eacute;servations</span>
+            </a>
+
+            <a href="@Url.Action("Index", "Matiere")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Matiere") ? "nav-item-active" : "")">
+                <i class="fas fa-book w-6"></i>
+                <span class="font-medium">Mati&egrave;res</span>
+            </a>
+
+            <a href="@Url.Action("Index", "Classe")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Classe") ? "nav-item-active" : "")">
+                <i class="fas fa-users w-6"></i>
+                <span class="font-medium">Classes & Fili&egrave;res</span>
+            </a>
+
+            @if (User.IsInRole("Administrateur"))
+            {
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Administration</p>
+                </div>
+                <a href="@Url.Action("Index", "UserManagement")" class="nav-item-hover flex items-center px-4 py-3 rounded-lg text-gray-300 @((ViewContext.RouteData.Values["Controller"]?.ToString() == "UserManagement") ? "nav-item-active" : "")">
+                    <i class="fas fa-user-shield w-6"></i>
+                    <span class="font-medium">Utilisateurs</span>
+                </a>
+            }
+        </nav>
+
+        <div class="p-4 border-t border-gray-700">
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" onclick="return confirm('D&eacute;connexion ?');" class="w-full flex items-center justify-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30">
+                    <i class="fas fa-sign-out-alt mr-2"></i> D&eacute;connexion
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-gray-50">
+        <!-- Header -->
+        <header class="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-6 z-10 sticky top-0">
+            <div class="flex items-center">
+                <h1 class="text-xl font-bold text-gray-800">@ViewData["Title"]</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">@User.Identity?.Name</span>
+                    @{
+                        var roles = User.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
+                    }
+                    @if (roles.Count > 0)
+                    {
+                        <span class="px-2 py-1 text-xs rounded-md bg-blue-500 text-white font-medium shadow-sm">@roles.First()</span>
+                    }
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="flex-1 overflow-auto p-6">
             @if (TempData["Success"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3"></i>
+                    <p class="text-sm text-green-700">@TempData["Success"]</p>
                 </div>
             }
             @if (TempData["Error"] != null)
             {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
+                    <p class="text-sm text-red-700">@TempData["Error"]</p>
                 </div>
             }
 
-            <!-- Contenu des vues -->
-            @RenderBody()
+            <div class="animate-fade-in-up">
+                @RenderBody()
+            </div>
         </div>
-    </div>
+    </main>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        @@keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-
     @RenderSection("Scripts", required: false)
 </body>
 </html>
+

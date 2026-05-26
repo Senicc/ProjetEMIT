@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+Ôªøusing Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetEMIT.Models;
 using ProjetEMIT.Repositories.Interfaces;
@@ -51,7 +51,7 @@ public class ReservationController : Controller
         var userId = await _reservationService.GetCurrentUserIdAsync(User);
         if (string.IsNullOrEmpty(userId))
         {
-            ModelState.AddModelError("", "Utilisateur non authentifiù.");
+            ModelState.AddModelError("", "Utilisateur non authentifi¬ù.");
             ViewBag.Salles = await _salleService.GetAllSallesAsync();
             return View(model);
         }
@@ -64,14 +64,14 @@ public class ReservationController : Controller
             HeureFin = model.HeureFin,
             Motif = model.Motif,
             DemandeurId = userId,
-            Statut = "EnAttente"
+            Statut = ProjetEMIT.Models.Enums.ReservationStatus.EnAttente
         };
 
         var result = await _reservationService.CreateAsync(reservation);
 
         if (result.Success)
         {
-            TempData["Success"] = "Rùservation soumise avec succùs ! En attente de validation.";
+            TempData["Success"] = "R¬ùservation soumise avec succ¬ùs ! En attente de validation.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -109,3 +109,4 @@ public class ReservationController : Controller
         return RedirectToAction(nameof(Index));
     }
 }
+

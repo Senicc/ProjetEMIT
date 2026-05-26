@@ -16,35 +16,30 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         _context = context;
     }
 
-    private async Task<Creneau> ResolveCreneauAsync(Seance seance)
-    {
-        if (seance.Creneau != null) return seance.Creneau;
-        var c = await _context.Creneaux.AsNoTracking().FirstOrDefaultAsync(x => x.Id == seance.CreneauId);
-        return c ?? throw new InvalidOperationException("Créneau introuvable.");
-    }
-
     public async Task<ConflitResult> VerifierConflitsAsync(Seance seance, bool exclureSeanceActuelle = false)
     {
         var result = new ConflitResult();
         var exclureId = exclureSeanceActuelle ? seance.Id : (int?)null;
-        var creneau = await ResolveCreneauAsync(seance);
+
+        var debut = TimeOnly.FromTimeSpan(seance.HeureDebut);
+        var fin   = TimeOnly.FromTimeSpan(seance.HeureFin);
 
         if (await _seanceRepository.ExisteConflitSalleAsync(
-                seance.SalleId, seance.Date, creneau.HeureDebut, creneau.HeureFin, exclureId))
-            result.Conflits.Add("Salle déjà occupée à cet horaire");
+                seance.SalleId, seance.Date, debut, fin, exclureId))
+            result.Conflits.Add("Salle d&eacute;j&agrave; occup&eacute;e &agrave; cet horaire");
 
         if (await _seanceRepository.ExisteConflitEnseignantAsync(
-                seance.EnseignantId, seance.Date, creneau.HeureDebut, creneau.HeureFin, exclureId))
-            result.Conflits.Add("Enseignant déjà occupé à cet horaire");
+                seance.EnseignantId, seance.Date, debut, fin, exclureId))
+            result.Conflits.Add("Enseignant d&eacute;j&agrave; occup&eacute; &agrave; cet horaire");
 
         if (await _seanceRepository.ExisteConflitClasseAsync(
-                seance.ClasseId, seance.Date, creneau.HeureDebut, creneau.HeureFin, exclureId))
-            result.Conflits.Add("Classe déjà en cours à cet horaire");
+                seance.ClasseId, seance.Date, debut, fin, exclureId))
+            result.Conflits.Add("Classe d&eacute;j&agrave; en cours &agrave; cet horaire");
 
         result.HasConflit = result.Conflits.Count > 0;
         result.Message = result.HasConflit
-            ? "Conflits détectés : " + string.Join(" | ", result.Conflits)
-            : "Aucun conflit détecté";
+            ? "Conflits d&eacute;tect&eacute;s : " + string.Join(" | ", result.Conflits)
+            : "Aucun conflit d&eacute;tect&eacute;";
 
         return result;
     }

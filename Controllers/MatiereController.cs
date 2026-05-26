@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetEMIT.Models;
 using ProjetEMIT.Services.Interfaces;
@@ -61,7 +61,62 @@ public class MatiereController : Controller
 
         if (success)
         {
-            TempData["Success"] = "Mati?re cr??e avec succ?s !";
+            TempData["Success"] = "Mati&egrave;re cr&eacute;&eacute;e avec succ&egrave;s !";
+            return RedirectToAction(nameof(Index));
+        }
+
+        ViewBag.Filieres = await _filiereService.GetAllAsync();
+        ViewBag.Enseignants = await _enseignantService.GetAllAsync();
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var matiere = await _matiereService.GetByIdAsync(id);
+        if (matiere == null) return NotFound();
+
+        var model = new MatiereViewModel
+        {
+            Id = matiere.Id,
+            Code = matiere.Code,
+            Nom = matiere.Nom,
+            Coefficient = matiere.Coefficient,
+            NbreHeures = matiere.NbreHeures,
+            FiliereId = matiere.FiliereId,
+            SelectedEnseignantsIds = matiere.Enseignants.Select(e => e.Id).ToList()
+        };
+
+        ViewBag.Filieres = await _filiereService.GetAllAsync();
+        ViewBag.Enseignants = await _enseignantService.GetAllAsync();
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(MatiereViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Filieres = await _filiereService.GetAllAsync();
+            ViewBag.Enseignants = await _enseignantService.GetAllAsync();
+            return View(model);
+        }
+
+        var matiere = await _matiereService.GetByIdAsync(model.Id);
+        if (matiere == null) return NotFound();
+
+        matiere.Code = model.Code;
+        matiere.Nom = model.Nom;
+        matiere.Coefficient = model.Coefficient;
+        matiere.NbreHeures = model.NbreHeures;
+        matiere.FiliereId = model.FiliereId;
+
+        var success = await _matiereService.UpdateAsync(matiere, model.SelectedEnseignantsIds);
+
+        if (success)
+        {
+            TempData["Success"] = "Mati&egrave;re modifi&eacute;e avec succ&egrave;s !";
             return RedirectToAction(nameof(Index));
         }
 
@@ -76,8 +131,8 @@ public class MatiereController : Controller
     {
         var ok = await _matiereService.DeleteAsync(id);
         TempData[ok ? "Success" : "Error"] = ok
-            ? "Mati?re supprim?e."
-            : "Impossible de supprimer (s?ances ou donn?es li?es).";
+            ? "Mati&egrave;re supprim&eacute;e."
+            : "Impossible de supprimer (s&eacute;ances ou donn&eacute;es li&eacute;es).";
         return RedirectToAction(nameof(Index));
     }
 }

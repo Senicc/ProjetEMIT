@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;        // Pour [Required], [Display], etc.
+using System.ComponentModel.DataAnnotations;        // Pour [Required], [Display], etc.
 using Microsoft.AspNetCore.Identity;               // Pour Identity
 using Microsoft.EntityFrameworkCore;               // Pour DbContext, DbSet
-using ProjetEMIT.Models;
+using ProjetEMIT.Models.Enums;
 using ProjetEMIT.ViewModels;
 using ProjetEMIT.Services.Interfaces;
 using ProjetEMIT.Repositories.Interfaces;
@@ -22,7 +22,7 @@ namespace ProjetEMIT.Models
         public TimeOnly HeureFin { get; set; }
 
         public string Motif { get; set; } = string.Empty;
-        public string Statut { get; set; } = "EnAttente"; // EnAttente, Validee, Refusee, Annulee
+        public ReservationStatus Statut { get; set; } = ReservationStatus.EnAttente;
         public DateTime DateDemande { get; set; } = DateTime.UtcNow;
     }
 }

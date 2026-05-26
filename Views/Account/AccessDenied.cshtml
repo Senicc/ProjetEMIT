@@ -1,10 +1,19 @@
-@{
-    ViewData["Title"] = "Accès refusé";
+﻿@{
+    ViewData["Title"] = "Acc&egrave;s refus&eacute;";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="alert alert-danger">
-    <h4>Accès refusé</h4>
-    <p>Vous n'avez pas les droits nécessaires pour accéder à cette ressource.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Accueil</a>
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl border border-red-100">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <i class="fas fa-shield-alt text-4xl text-red-500"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-3">Acc&egrave;s Restreint</h2>
+        <p class="text-gray-500 mb-8">
+            D&eacute;sol&eacute;, vous ne disposez pas des autorisations n&eacute;cessaires pour acc&eacute;der &agrave; cette page ou effectuer cette action.
+        </p>
+        <a asp-controller="Home" asp-action="Index" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">
+            <i class="fas fa-home mr-2"></i> Retour &agrave; l'accueil
+        </a>
+    </div>
 </div>

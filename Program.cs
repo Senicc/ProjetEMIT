@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjetEMIT;
@@ -9,6 +9,7 @@ using ProjetEMIT.Repositories.Implementations;
 using ProjetEMIT.Repositories.Interfaces;
 using ProjetEMIT.Services.Implementations;
 using ProjetEMIT.Services.Interfaces;
+using ProjetEMIT.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         options.User.RequireUniqueEmail = true;
         options.SignIn.RequireConfirmedEmail = false;
     })
+    .AddErrorDescriber<FrenchIdentityErrorDescriber>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -84,6 +86,8 @@ else
     app.UseDeveloperExceptionPage();
 }
 
+app.UseGlobalExceptionHandler();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -111,8 +115,11 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Une erreur est survenue lors du Seed de la base de donn�es.");
+        logger.LogError(ex, "Une erreur est survenue lors du Seed de la base de donnes.");
     }
 }
 
 app.Run();
+
+
+

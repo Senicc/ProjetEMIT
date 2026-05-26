@@ -1,57 +1,92 @@
-@model IEnumerable<ProjetEMIT.Models.Enseignant>
+ï»¿@model IEnumerable<ProjetEMIT.Models.Enseignant>
 
-    @{
-    ViewData["Title"] = "Gestion des Enseignants - EMIT";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    }
+@{
+    ViewData["Title"] = "Gestion des Enseignants";
+    var isAdminOrResp = User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique");
+}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-chalkboard-teacher"></i> Gestion des Enseignants</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="fas fa-plus"></i> Nouvel Enseignant
-        </a>
+<div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+    <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
+        <div>
+            <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                <i class="fas fa-chalkboard-teacher mr-2 text-indigo-600"></i> Corps Enseignant
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">Annuaire et gestion des professeurs.</p>
+        </div>
+        
+        @if (isAdminOrResp)
+        {
+            <a asp-action="Create" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium shadow-md shadow-indigo-500/20 transition-all flex items-center">
+                <i class="fas fa-user-plus mr-2"></i> Nouvel Enseignant
+            </a>
+        }
     </div>
 
-    <table class="table table-hover table-bordered align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Nom Complet</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Spécialité</th>
-                <th>Matières</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-        {
-            <tr>
-                <td><strong>@item.Prenom @item.Nom</strong></td>
-                <td>@item.Email</td>
-                <td>@item.Telephone</td>
-                <td>@item.Specialite</td>
-                <td>
-                    @if (item.Matieres.Any())
-                    {
-                    <span class="badge bg-primary">@string.Join(", ", item.Matieres.Select(m => m.Nom))</span>
-                    }
-                    else
-                    {
-                    <span class="text-muted">Aucune matière assignée</span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Détails</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Modifier</a>
-                    <form asp-action="Delete" asp-route-id="@item.Id" style="display:inline;">
-                        <button type="submit" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Supprimer cet enseignant ?')">
-                            Supprimer
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
+                    <th class="p-4 font-medium">Professeur</th>
+                    <th class="p-4 font-medium">Email & Contact</th>
+                    <th class="p-4 font-medium">Sp&eacute;cialit&eacute;</th>
+                    
+                    <th class="p-4 font-medium text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 font-bold shadow-sm">
+                                    @(item.Prenom?.Length > 0 ? item.Prenom.Substring(0,1) : "P")@(item.Nom?.Length > 0 ? item.Nom.Substring(0,1) : "E")
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-800">@item.Prenom @item.Nom</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-gray-700"><i class="fas fa-envelope text-gray-400 mr-2"></i> @item.Email</div>
+                            <div class="text-gray-500 text-xs mt-1"><i class="fas fa-phone text-gray-400 mr-2"></i> @item.Telephone</div>
+                        </td>
+                        <td class="p-4 text-gray-700">
+                            @item.Specialite
+                        </td>
+                        
+                        <td class="p-4 text-right space-x-2">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-block" title="D&eacute;tails">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            
+                            @if (isAdminOrResp)
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100 p-2 rounded-lg transition-colors inline-block" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form asp-action="Delete" method="post" class="inline-block">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer cet enseignant ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                
+                @if(!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="p-8 text-center text-gray-500">
+                            <i class="fas fa-user-slash text-4xl mb-3 text-gray-300"></i>
+                            <p>Aucun enseignant n'a &eacute;t&eacute; trouv&eacute;.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

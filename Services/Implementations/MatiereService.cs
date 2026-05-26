@@ -1,4 +1,4 @@
-using ProjetEMIT.Models;
+﻿using ProjetEMIT.Models;
 using ProjetEMIT.Repositories.Interfaces;
 using ProjetEMIT.Services.Interfaces;
 
@@ -18,8 +18,12 @@ public class MatiereService : IMatiereService
 
     public async Task<IEnumerable<Matiere>> GetAllAsync()
     {
-        var list = await _matiereRepository.GetAllWithDetailsAsync(null);
-        return list;
+        return await _matiereRepository.GetAllWithDetailsAsync(null);
+    }
+
+    public async Task<Matiere?> GetByIdAsync(int id)
+    {
+        return await _matiereRepository.GetWithDetailsAsync(id);
     }
 
     public async Task<bool> CreateAsync(Matiere matiere, IEnumerable<int> enseignantIds)
@@ -29,13 +33,18 @@ public class MatiereService : IMatiereService
         return true;
     }
 
+    public async Task<bool> UpdateAsync(Matiere matiere, IEnumerable<int> enseignantIds)
+    {
+        await _matiereRepository.UpdateAsync(matiere);
+        await _matiereRepository.ReplaceEnseignantsAsync(matiere.Id, enseignantIds);
+        return true;
+    }
+
     public async Task<bool> DeleteAsync(int id)
     {
         var m = await _matiereRepository.GetWithDetailsAsync(id);
         if (m == null) return false;
-        if (m.Seances.Any())
-            return false;
-
+        if (m.Seances.Any()) return false;
         await _matiereRepository.DeleteAsync(id);
         return true;
     }

@@ -1,105 +1,162 @@
-@{
-    ViewData["Title"] = "Emplois du Temps - EMIT";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+ï»¿@{
+    ViewData["Title"] = "Emplois du Temps";
+    var isAdminOrResp = User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique");
 }
 
-<div class="card shadow">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h4 class="mb-0"><i class="fas fa-calendar-alt"></i> Emplois du Temps - EMIT</h4>
-        @if (User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique"))
-        {
-            <a asp-action="Create" class="btn btn-light btn-sm"><i class="fas fa-plus"></i> Nouvelle séance</a>
-        }
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
+
+<div class="space-y-6">
+    <!-- Header with actions -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">
+                <i class="fas fa-calendar-alt text-cyan-600 mr-2"></i> Emplois du Temps
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">Visualisez et g&eacute;rez le planning des s&eacute;ances de cours.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            @if (isAdminOrResp)
+            {
+                <a asp-action="Create" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium shadow-md shadow-cyan-500/20 transition-all flex items-center text-sm">
+                    <i class="fas fa-plus mr-2"></i> Ajouter une S&eacute;ance
+                </a>
+            }
+        </div>
     </div>
-    <div class="card-body">
-        <!-- Filtres -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <label class="form-label">Filtrer par Classe</label>
-                <select id="classeFilter" class="form-select">
+
+    <!-- Filters Row -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Classe filter -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                    <i class="fas fa-users mr-1"></i> Filtrer par Classe
+                </label>
+                <select id="filterClasse" class="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     <option value="">Toutes les classes</option>
-                    <!-- Rempli dynamiquement via JS ou ViewBag -->
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Filtrer par Salle</label>
-                <select id="salleFilter" class="form-select">
-                    <option value="">Toutes les salles</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Filtrer par Enseignant</label>
-                <select id="enseignantFilter" class="form-select">
+            <!-- Enseignant filter -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                    <i class="fas fa-chalkboard-teacher mr-1"></i> Filtrer par Enseignant
+                </label>
+                <select id="filterEnseignant" class="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     <option value="">Tous les enseignants</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button id="btnReset" class="btn btn-secondary w-100">Réinitialiser Filtres</button>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <a asp-action="ExportPdf" class="btn btn-danger w-100" target="_blank">
-                    <i class="fas fa-file-pdf"></i> Exporter PDF
-                </a>
+            <!-- Salle filter -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                    <i class="fas fa-door-open mr-1"></i> Filtrer par Salle
+                </label>
+                <select id="filterSalle" class="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <option value="">Toutes les salles</option>
+                </select>
             </div>
         </div>
+        <div class="mt-3 flex items-center justify-end">
+            <button id="exportPdf" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md shadow-rose-500/20 transition-all flex items-center">
+                <i class="fas fa-file-pdf mr-2"></i> Exporter en PDF
+            </button>
+        </div>
+    </div>
 
-        <!-- Calendrier -->
-        <div id="calendar" style="min-height: 700px;"></div>
+    <!-- Legend -->
+    <div class="flex flex-wrap items-center gap-3">
+        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">L&eacute;gende :</span>
+        <span class="flex items-center text-xs font-medium"><span class="inline-block w-3 h-3 rounded mr-1.5 bg-blue-500"></span>Cours</span>
+        <span class="flex items-center text-xs font-medium"><span class="inline-block w-3 h-3 rounded mr-1.5 bg-green-500"></span>TD</span>
+        <span class="flex items-center text-xs font-medium"><span class="inline-block w-3 h-3 rounded mr-1.5 bg-orange-500"></span>TP</span>
+        <span class="flex items-center text-xs font-medium"><span class="inline-block w-3 h-3 rounded mr-1.5 bg-red-500"></span>Examen</span>
+    </div>
+
+    <!-- Calendar -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <div id="calendar"></div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script>
-        let calendar;
-
         document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
 
-            calendar = new FullCalendar.Calendar(calendarEl, {
+            function getFilters() {
+                return {
+                    classeId: document.getElementById('filterClasse').value || null,
+                    salleId: document.getElementById('filterSalle').value || null,
+                    enseignantId: document.getElementById('filterEnseignant').value || null,
+                };
+            }
+
+            const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialView: 'timeGridWeek',
                 locale: 'fr',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
                 },
-                slotMinTime: '08:00:00',
-                slotMaxTime: '19:00:00',
+                slotMinTime: '07:00:00',
+                slotMaxTime: '20:00:00',
                 allDaySlot: false,
-                editable: false,
-                selectable: true,
+                height: 650,
                 nowIndicator: true,
-
+                eventTimeFormat: { hour: '2-digit', minute: '2-digit', meridiem: false },
                 events: function (fetchInfo, successCallback, failureCallback) {
-                    const classeId = document.getElementById('classeFilter').value;
-                    const salleId = document.getElementById('salleFilter').value;
-                    const enseignantId = document.getElementById('enseignantFilter').value;
+                    const f = getFilters();
+                    const url = new URL('@Url.Action("GetEvents", "EmploiDuTemps")', window.location.origin);
+                    url.searchParams.set('start', fetchInfo.startStr);
+                    url.searchParams.set('end', fetchInfo.endStr);
+                    if (f.classeId) url.searchParams.set('classeId', f.classeId);
+                    if (f.salleId) url.searchParams.set('salleId', f.salleId);
+                    if (f.enseignantId) url.searchParams.set('enseignantId', f.enseignantId);
 
-                    fetch(`/EmploiDuTemps/GetEvents?start=${fetchInfo.startStr}&end=${fetchInfo.endStr}&classeId=${classeId}&salleId=${salleId}&enseignantId=${enseignantId}`)
-                        .then(response => response.json())
+                    fetch(url)
+                        .then(r => r.json())
                         .then(data => successCallback(data))
-                        .catch(error => failureCallback(error));
+                        .catch(err => failureCallback(err));
                 },
-
-                eventClick: function (info) {
-                    const props = info.event.extendedProps;
-                    alert(`Matière : ${props.matiere}\nClasse : ${props.classe}\nSalle : ${props.salle}\nEnseignant : ${props.enseignant}\nType : ${props.typeSeance}`);
+                eventDidMount: function(info) {
+                    const p = info.event.extendedProps;
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'fc-tooltip';
+                    tooltip.innerHTML =
+                        '<b>' + (p.matiere || '') + '</b><br>' +
+                        '<i class=\"fas fa-users\"></i> ' + (p.classe || '') + '<br>' +
+                        '<i class=\"fas fa-chalkboard-teacher\"></i> ' + (p.enseignant || '') + '<br>' +
+                        '<i class=\"fas fa-door-open\"></i> ' + (p.salle || '') + '<br>' +
+                        '<span class=\"badge\">' + (p.typeSeance || '') + '</span>';
+                    info.el.setAttribute('title', (p.matiere || '') + ' - ' + (p.salle || ''));
                 }
             });
 
             calendar.render();
 
-            // Recharger le calendrier quand on change un filtre
-            document.getElementById('classeFilter').addEventListener('change', () => calendar.refetchEvents());
-            document.getElementById('salleFilter').addEventListener('change', () => calendar.refetchEvents());
-            document.getElementById('enseignantFilter').addEventListener('change', () => calendar.refetchEvents());
+            // Refresh on filter change
+            ['filterClasse', 'filterEnseignant', 'filterSalle'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => calendar.refetchEvents());
+            });
 
-            document.getElementById('btnReset').addEventListener('click', () => {
-                document.getElementById('classeFilter').value = '';
-                document.getElementById('salleFilter').value = '';
-                document.getElementById('enseignantFilter').value = '';
-                calendar.refetchEvents();
+            // PDF Export
+            document.getElementById('exportPdf').addEventListener('click', function () {
+                const f = getFilters();
+                const url = new URL('@Url.Action("ExportPdf", "EmploiDuTemps")', window.location.origin);
+                if (f.classeId) url.searchParams.set('classeId', f.classeId);
+                if (f.salleId) url.searchParams.set('salleId', f.salleId);
+                if (f.enseignantId) url.searchParams.set('enseignantId', f.enseignantId);
+                window.open(url.toString(), '_blank');
             });
         });
     </script>
+    <style>
+        .fc { font-family: 'Inter', sans-serif; }
+        .fc .fc-button-primary { background-color: #0891b2; border-color: #0891b2; }
+        .fc .fc-button-primary:hover { background-color: #0e7490; border-color: #0e7490; }
+        .fc .fc-button-primary:not(:disabled).fc-button-active { background-color: #155e75; border-color: #155e75; }
+        .fc-event { border-radius: 6px; border: none !important; padding: 2px 6px; font-size: 0.78em; font-weight: 600; }
+        .fc-event-title { font-weight: 600; }
+        .fc-col-header-cell { background: #f8fafc; font-weight: 600; }
+    </style>
 }

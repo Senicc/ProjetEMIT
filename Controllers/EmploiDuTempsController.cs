@@ -15,7 +15,6 @@ public class EmploiDuTempsController : Controller
     private readonly ISalleService _salleService;
     private readonly IEnseignantService _enseignantService;
     private readonly IRapportService _rapportService;
-    private readonly ICreneauRepository _creneauRepository;
     private readonly IMatiereRepository _matiereRepository;
     private readonly IClasseRepository _classeRepository;
 
@@ -24,7 +23,6 @@ public class EmploiDuTempsController : Controller
         ISalleService salleService,
         IEnseignantService enseignantService,
         IRapportService rapportService,
-        ICreneauRepository creneauRepository,
         IMatiereRepository matiereRepository,
         IClasseRepository classeRepository)
     {
@@ -32,7 +30,6 @@ public class EmploiDuTempsController : Controller
         _salleService = salleService;
         _enseignantService = enseignantService;
         _rapportService = rapportService;
-        _creneauRepository = creneauRepository;
         _matiereRepository = matiereRepository;
         _classeRepository = classeRepository;
     }
@@ -62,8 +59,8 @@ public class EmploiDuTempsController : Controller
         {
             id = s.Id,
             title = $"{s.Matiere.Code} - {s.Matiere.Nom}\n{s.Classe.Nom}",
-            start = $"{s.Date.ToString("yyyy-MM-dd", inv)}T{s.Creneau.HeureDebut.ToString("HH\\:mm\\:ss", inv)}",
-            end = $"{s.Date.ToString("yyyy-MM-dd", inv)}T{s.Creneau.HeureFin.ToString("HH\\:mm\\:ss", inv)}",
+            start = $"{s.Date.ToString("yyyy-MM-dd", inv)}T{s.HeureDebut.ToString("hh\\:mm\\:ss", inv)}",
+            end = $"{s.Date.ToString("yyyy-MM-dd", inv)}T{s.HeureFin.ToString("hh\\:mm\\:ss", inv)}",
             color = GetEventColor(s.TypeSeance),
             extendedProps = new
             {
@@ -113,6 +110,11 @@ public class EmploiDuTempsController : Controller
     [Authorize(Roles = "Administrateur,ResponsablePedagogique")]
     public async Task<IActionResult> Create(SeanceViewModel model)
     {
+        if (model.HeureFin <= model.HeureDebut)
+        {
+            ModelState.AddModelError("HeureFin", "L'heure de fin doit &ecirc;tre post&eacute;rieure &agrave; l'heure de d&eacute;but.");
+        }
+
         if (!ModelState.IsValid)
         {
             await PopulateSeanceLookupsAsync();
@@ -122,7 +124,8 @@ public class EmploiDuTempsController : Controller
         var seance = new Seance
         {
             Date = model.Date,
-            CreneauId = model.CreneauId,
+            HeureDebut = model.HeureDebut,
+            HeureFin = model.HeureFin,
             SalleId = model.SalleId,
             EnseignantId = model.EnseignantId,
             MatiereId = model.MatiereId,
@@ -133,7 +136,7 @@ public class EmploiDuTempsController : Controller
         try
         {
             await _emploiService.CreerSeanceAsync(seance);
-            TempData["Success"] = "Séance ajoutée avec succès !";
+            TempData["Success"] = "S&eacute;ance ajout&eacute;e avec succ&egrave;s !";
             return RedirectToAction(nameof(Index));
         }
         catch (InvalidOperationException ex)
@@ -148,7 +151,6 @@ public class EmploiDuTempsController : Controller
     {
         ViewBag.Salles = await _salleService.GetAllSallesAsync();
         ViewBag.Enseignants = await _enseignantService.GetAllAsync();
-        ViewBag.Creneaux = await _creneauRepository.GetAllAsync();
         ViewBag.Matieres = await _matiereRepository.GetAllWithDetailsAsync(null);
         ViewBag.Classes = await _classeRepository.GetAllWithDetailsAsync();
     }

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjetEMIT")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+724829075d9ebea7c02966ef25ef3c29021a927b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+06550245fddb5019419d0fb7a42574a2e86251eb")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjetEMIT")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjetEMIT")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

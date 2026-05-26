@@ -471,3 +471,4 @@ c:\Users\ASUS\ProjetEMIT\obj\Debug\net8.0\refint\ProjetEMIT.dll
 c:\Users\ASUS\ProjetEMIT\obj\Debug\net8.0\ProjetEMIT.pdb
 c:\Users\ASUS\ProjetEMIT\obj\Debug\net8.0\ProjetEMIT.genruntimeconfig.cache
 c:\Users\ASUS\ProjetEMIT\obj\Debug\net8.0\ref\ProjetEMIT.dll
+C:\Users\ASUS\ProjetEMIT\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

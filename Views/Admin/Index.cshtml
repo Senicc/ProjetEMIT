@@ -1,111 +1,105 @@
-@model ProjetEMIT.ViewModels.AdminDashboardViewModel
+ï»¿@model ProjetEMIT.ViewModels.AdminDashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard Administrateur - EMIT";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dashboard d'Administration";
 }
 
-<div class="container-fluid">
-    <h2 class="mb-4"><i class="fas fa-tachometer-alt"></i> Tableau de Bord - EMIT</h2>
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Tableau de Bord</h1>
+        <p class="text-gray-500 mt-1">Aper&ccedil;u en temps r&eacute;el de l'&eacute;tablissement.</p>
+    </div>
+</div>
 
-    <!-- Cartes statistiques -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Salles Totales</div>
-                            <div class="h3 mb-0 font-weight-bold text-gray-800">@Model.TotalSalles</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-door-open fa-2x text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- Dashboard Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center">
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mr-4">
+            <i class="fas fa-door-open text-xl"></i>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Enseignants</div>
-                            <div class="h3 mb-0 font-weight-bold text-gray-800">@Model.TotalEnseignants</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-chalkboard-teacher fa-2x text-success"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Cours Aujourd'hui</div>
-                            <div class="h3 mb-0 font-weight-bold text-gray-800">@Model.TotalSeancesAujourdHui</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-calendar-check fa-2x text-info"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Taux Occupation</div>
-                            <div class="h3 mb-0 font-weight-bold text-gray-800">@Model.TauxOccupation.ToString("0")%</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-chart-pie fa-2x text-warning"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <p class="text-sm text-gray-500 font-medium">Salles Totales</p>
+            <h3 class="text-2xl font-bold text-gray-800">@Model.TotalSalles</h3>
         </div>
     </div>
-
-    <!-- Graphique + Tableau -->
-    <div class="row">
-        <!-- Graphique d'occupation -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Taux d'Occupation des Salles (7 derniers jours)</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="occupationChart" style="height: 300px;"></canvas>
-                </div>
-            </div>
+    
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center">
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mr-4">
+            <i class="fas fa-chalkboard-teacher text-xl"></i>
         </div>
+        <div>
+            <p class="text-sm text-gray-500 font-medium">Enseignants Actifs</p>
+            <h3 class="text-2xl font-bold text-gray-800">@Model.TotalEnseignants</h3>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center">
+        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 mr-4">
+            <i class="fas fa-users text-xl"></i>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500 font-medium">Classes</p>
+            <h3 class="text-2xl font-bold text-gray-800">@Model.TotalClasses</h3>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center">
+        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 mr-4">
+            <i class="fas fa-calendar-day text-xl"></i>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500 font-medium">S&eacute;ances Aujourd'hui</p>
+            <h3 class="text-2xl font-bold text-gray-800">@Model.TotalSeancesAujourdHui</h3>
+        </div>
+    </div>
+</div>
 
-        <!-- Salles les plus utilisées -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Salles les plus utilisées</h6>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Top Salles Table -->
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-fire text-rose-500 mr-2"></i> Salles les plus utilis&eacute;es
+        </h3>
+        
+        @if (Model.SallesLesPlusUtilisees != null && Model.SallesLesPlusUtilisees.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                            <th class="py-3 px-4 font-medium">Salle</th>
+                            <th class="py-3 px-4 font-medium text-right">S&eacute;ances</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
                         @foreach (var salle in Model.SallesLesPlusUtilisees)
                         {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            @salle.NomSalle
-                            <span class="badge bg-primary">@salle.NombreSeances séances</span>
-                        </li>
+                            <tr class="hover:bg-gray-50 transition-colors text-sm">
+                                <td class="py-3 px-4 font-medium text-gray-800">@salle.NomSalle</td>
+                                <td class="py-3 px-4 text-gray-600 text-right">
+                                    <span class="inline-block px-2 py-1 bg-rose-50 text-rose-700 rounded-md font-semibold">@salle.NombreSeances</span>
+                                </td>
+                            </tr>
                         }
-                    </ul>
-                </div>
+                    </tbody>
+                </table>
             </div>
+        }
+        else
+        {
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-chart-pie text-4xl mb-3 text-gray-300"></i>
+                <p>Aucune s&eacute;ance planifi&eacute;e pour le moment.</p>
+            </div>
+        }
+    </div>
+
+    <!-- Chart -->
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-chart-line text-blue-500 mr-2"></i> Occupation (7 derniers jours)
+        </h3>
+        <div class="relative w-full flex-grow flex items-center justify-center min-h-[250px]">
+            <canvas id="occupationChart"></canvas>
         </div>
     </div>
 </div>
@@ -113,24 +107,50 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Graphique Chart.js
-        fetch('/Admin/GetOccupationStats')
-            .then(response => response.json())
-            .then(data => {
-                new Chart(document.getElementById('occupationChart'), {
-                    type: 'line',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'Taux Occupation (%)',
-                            data: data.values,
-                            borderColor: '#1e88e5',
-                            backgroundColor: 'rgba(30, 136, 229, 0.2)',
-                            tension: 0.3
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch real data from the controller API
+            fetch('@Url.Action("GetOccupationStats", "Admin")')
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('occupationChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Nombre de S&eacute;ances',
+                                data: data.values,
+                                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true, 
+                                    ticks: { stepSize: 1 },
+                                    grid: { borderDash: [2, 4], color: '#f3f4f6' } 
+                                },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des statistiques:', error);
                 });
-            });
+        });
     </script>
 }

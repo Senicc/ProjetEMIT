@@ -1,40 +1,101 @@
-@model ProjetEMIT.Models.Salle
+﻿@model ProjetEMIT.Models.Salle
 @{
-    ViewData["Title"] = "Salle";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "D&eacute;tail Salle";
     var seances = ViewBag.SeancesAujourdhui as IEnumerable<ProjetEMIT.Models.Seance>;
 }
 
-<div class="mb-3">
-    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header Actions -->
+    <div class="flex justify-between items-center">
+        <a asp-action="Index" class="text-gray-500 hover:text-gray-700 transition-colors flex items-center text-sm font-medium">
+            <i class="fas fa-arrow-left mr-2"></i> Retour aux salles
+        </a>
+        <div class="space-x-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center">
+                <i class="fas fa-edit mr-2"></i> Modifier
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-rose-500 to-rose-700 p-8 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 opacity-10">
+                <i class="fas fa-door-open text-9xl"></i>
+            </div>
+            <div class="relative z-10">
+                <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-semibold backdrop-blur-sm mb-3">
+                    @Model.TypeSalle
+                </span>
+                <h2 class="text-3xl font-bold">@Model.NomSalle</h2>
+                <p class="text-rose-100 mt-2 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2"></i> @Model.Localisation
+                </p>
+            </div>
+        </div>
+
+        <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-100 pb-2">Informations</h3>
+                    
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 mr-4 shrink-0">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Capacit&eacute;</p>
+                            <p class="font-medium text-gray-900">@Model.Capacite places</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 rounded-full @(Model.EstDisponible ? "bg-emerald-50 text-emerald-500" : "bg-red-50 text-red-500") flex items-center justify-center mr-4 shrink-0">
+                            <i class="fas @(Model.EstDisponible ? "fa-check-circle" : "fa-times-circle")"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Statut</p>
+                            <p class="font-medium @(Model.EstDisponible ? "text-emerald-600" : "text-red-600")">
+                                @(Model.EstDisponible ? "Disponible" : "Indisponible")
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-calendar-day text-rose-500 mr-2"></i> S&eacute;ances d'aujourd'hui
+                    </h3>
+                    
+                    @if (seances != null && seances.Any())
+                    {
+                        <div class="space-y-4">
+                            @foreach (var s in seances)
+                            {
+                                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">@s.Matiere.Nom</p>
+                                        <p class="text-xs text-gray-500 mt-1"><i class="fas fa-users mr-1"></i> @s.Classe.Nom</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="inline-block px-2 py-1 bg-rose-50 text-rose-700 rounded text-xs font-medium">
+                                            @s.HeureDebut.ToString("hh\\:mm") - @s.HeureFin.ToString("hh\\:mm")
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-6 text-gray-500">
+                            <i class="fas fa-bed text-3xl mb-3 text-gray-300"></i>
+                            <p class="text-sm">Aucune s&eacute;ance pr&eacute;vue aujourd'hui.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="card shadow">
-    <div class="card-header bg-primary text-white">
-        <h4>@Model.NomSalle</h4>
-    </div>
-    <div class="card-body">
-        <p><strong>Capacité :</strong> @Model.Capacite</p>
-        <p><strong>Type :</strong> @Model.TypeSalle</p>
-        <p><strong>Localisation :</strong> @Model.Localisation</p>
-        <p><strong>Disponible :</strong> @(Model.EstDisponible ? "Oui" : "Non")</p>
-    </div>
-</div>
-
-@if (seances != null && seances.Any())
-{
-    <h5 class="mt-4">Séances aujourd'hui</h5>
-    <table class="table table-sm">
-        <thead><tr><th>Créneau</th><th>Matière</th><th>Classe</th></tr></thead>
-        <tbody>
-        @foreach (var s in seances)
-        {
-            <tr>
-                <td>@s.Creneau.HeureDebut - @s.Creneau.HeureFin</td>
-                <td>@s.Matiere.Nom</td>
-                <td>@s.Classe.Nom</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}

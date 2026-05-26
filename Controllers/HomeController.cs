@@ -1,15 +1,12 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ProjetEMIT.Models;
-using System.ComponentModel.DataAnnotations;        // Pour [Required], [Display], etc.
-using Microsoft.AspNetCore.Identity;               // Pour Identity
-using Microsoft.EntityFrameworkCore;               // Pour DbContext, DbSet
+using Microsoft.AspNetCore.Authorization;
 using ProjetEMIT.ViewModels;
-using ProjetEMIT.Services.Interfaces;
-using ProjetEMIT.Repositories.Interfaces;
 
 namespace ProjetEMIT.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,7 +18,14 @@ namespace ProjetEMIT.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            // Redirection intelligente en fonction du r&ocirc;le
+            if (User.IsInRole("Administrateur") || User.IsInRole("ResponsablePedagogique"))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+            
+            // Pour les enseignants et autres utilisateurs
+            return RedirectToAction("Index", "EmploiDuTemps");
         }
 
         public IActionResult Privacy()

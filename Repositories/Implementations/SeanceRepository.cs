@@ -14,8 +14,8 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         return await _context.Seances.AnyAsync(s =>
             s.SalleId == salleId &&
             s.Date == date &&
-            s.Creneau.HeureDebut < fin &&
-            s.Creneau.HeureFin > debut);
+            s.HeureDebut < fin.ToTimeSpan() &&
+            s.HeureFin > debut.ToTimeSpan());
     }
 
     public async Task<bool> ExisteConflitSalleAsync(int salleId, DateOnly date, TimeOnly debut, TimeOnly fin, int? seanceIdExclure = null)
@@ -23,8 +23,8 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         return await _context.Seances.AnyAsync(s =>
             s.SalleId == salleId &&
             s.Date == date &&
-            s.Creneau.HeureDebut < fin &&
-            s.Creneau.HeureFin > debut &&
+            s.HeureDebut < fin.ToTimeSpan() &&
+            s.HeureFin > debut.ToTimeSpan() &&
             (seanceIdExclure == null || s.Id != seanceIdExclure));
     }
 
@@ -33,8 +33,8 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         return await _context.Seances.AnyAsync(s =>
             s.EnseignantId == enseignantId &&
             s.Date == date &&
-            s.Creneau.HeureDebut < fin &&
-            s.Creneau.HeureFin > debut &&
+            s.HeureDebut < fin.ToTimeSpan() &&
+            s.HeureFin > debut.ToTimeSpan() &&
             (seanceIdExclure == null || s.Id != seanceIdExclure));
     }
 
@@ -43,8 +43,8 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         return await _context.Seances.AnyAsync(s =>
             s.ClasseId == classeId &&
             s.Date == date &&
-            s.Creneau.HeureDebut < fin &&
-            s.Creneau.HeureFin > debut &&
+            s.HeureDebut < fin.ToTimeSpan() &&
+            s.HeureFin > debut.ToTimeSpan() &&
             (seanceIdExclure == null || s.Id != seanceIdExclure));
     }
 
@@ -53,7 +53,7 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         var query = BaseQuery().Where(s => s.ClasseId == classeId);
         if (dateDebut.HasValue) query = query.Where(s => s.Date >= dateDebut.Value);
         if (dateFin.HasValue) query = query.Where(s => s.Date <= dateFin.Value);
-        return await query.OrderBy(s => s.Date).ThenBy(s => s.Creneau.HeureDebut).ToListAsync();
+        return await query.OrderBy(s => s.Date).ThenBy(s => s.HeureDebut).ToListAsync();
     }
 
     public async Task<IEnumerable<Seance>> GetEmploiDuTempsParEnseignantAsync(int enseignantId, DateOnly? dateDebut = null, DateOnly? dateFin = null)
@@ -61,7 +61,7 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         var query = BaseQuery().Where(s => s.EnseignantId == enseignantId);
         if (dateDebut.HasValue) query = query.Where(s => s.Date >= dateDebut.Value);
         if (dateFin.HasValue) query = query.Where(s => s.Date <= dateFin.Value);
-        return await query.OrderBy(s => s.Date).ThenBy(s => s.Creneau.HeureDebut).ToListAsync();
+        return await query.OrderBy(s => s.Date).ThenBy(s => s.HeureDebut).ToListAsync();
     }
 
     public async Task<IEnumerable<Seance>> GetEmploiDuTempsParSalleAsync(int salleId, DateOnly? dateDebut = null, DateOnly? dateFin = null)
@@ -69,7 +69,7 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         var query = BaseQuery().Where(s => s.SalleId == salleId);
         if (dateDebut.HasValue) query = query.Where(s => s.Date >= dateDebut.Value);
         if (dateFin.HasValue) query = query.Where(s => s.Date <= dateFin.Value);
-        return await query.OrderBy(s => s.Date).ThenBy(s => s.Creneau.HeureDebut).ToListAsync();
+        return await query.OrderBy(s => s.Date).ThenBy(s => s.HeureDebut).ToListAsync();
     }
 
     public async Task<IEnumerable<Seance>> GetAllInRangeAsync(DateOnly? dateDebut = null, DateOnly? dateFin = null)
@@ -77,7 +77,7 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
         var query = BaseQuery();
         if (dateDebut.HasValue) query = query.Where(s => s.Date >= dateDebut.Value);
         if (dateFin.HasValue) query = query.Where(s => s.Date <= dateFin.Value);
-        return await query.OrderBy(s => s.Date).ThenBy(s => s.Creneau.HeureDebut).ToListAsync();
+        return await query.OrderBy(s => s.Date).ThenBy(s => s.HeureDebut).ToListAsync();
     }
 
     public async Task<int> CountSeancesDuJourAsync(DateOnly jour) =>
@@ -128,6 +128,5 @@ public class SeanceRepository : BaseRepository<Seance>, ISeanceRepository
             .Include(s => s.Matiere)
             .Include(s => s.Enseignant)
             .Include(s => s.Salle)
-            .Include(s => s.Creneau)
             .Include(s => s.Classe);
 }

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using ProjetEMIT.Models;
+using ProjetEMIT.Models.Enums;
 using ProjetEMIT.Repositories.Interfaces;
 using ProjetEMIT.Services.Interfaces;
 
@@ -63,7 +64,7 @@ public class ReservationService : IReservationService
         if (await _seanceRepository.SalleOccupeeParSeanceAsync(r.SalleId, r.Date, r.HeureDebut, r.HeureFin))
             return new ServiceResult(false, "Impossible de valider : un cours occupe déjà cette salle.");
 
-        r.Statut = "Validee";
+        r.Statut = ReservationStatus.Validee;
         await _reservationRepository.UpdateAsync(r);
         return new ServiceResult(true, "Réservation validée.");
     }
@@ -73,7 +74,7 @@ public class ReservationService : IReservationService
         var r = await _reservationRepository.GetByIdAsync(id);
         if (r == null) return new ServiceResult(false, "Réservation introuvable.");
 
-        r.Statut = "Refusee";
+        r.Statut = ReservationStatus.Refusee;
         if (!string.IsNullOrWhiteSpace(motifRefus))
             r.Motif = string.IsNullOrEmpty(r.Motif) ? $"Refus : {motifRefus}" : $"{r.Motif} | Refus : {motifRefus}";
 
@@ -91,7 +92,7 @@ public class ReservationService : IReservationService
         if (!isAdmin && r.DemandeurId != userId)
             return new ServiceResult(false, "Vous ne pouvez pas annuler cette réservation.");
 
-        r.Statut = "Annulee";
+        r.Statut = ReservationStatus.Annulee;
         await _reservationRepository.UpdateAsync(r);
         return new ServiceResult(true, "Réservation annulée.");
     }
